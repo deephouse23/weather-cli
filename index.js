@@ -17,6 +17,23 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Beta banner function
+function showBetaBanner() {
+  if (process.argv.includes('--no-beta-banner') || program.opts().noBetaBanner) return;
+  
+  console.log(chalk.yellow.bold(`
+╔══════════════════════════════════════╗
+║              BETA SOFTWARE           ║
+║                                      ║
+║    Weather CLI v0.0.2-beta           ║
+║    Under active development          ║
+║                                      ║
+║    Feedback & bugs welcome at:       ║
+║    github.com/deephouse23/weather-cli║
+╚══════════════════════════════════════╝
+`));
+}
+
 
 
 // Configuration
@@ -591,7 +608,8 @@ async function interactiveMode() {
 program
   .name('weather')
   .description('A beautiful CLI weather application')
-  .version('0.0.2');
+  .version('0.0.2-beta')
+  .option('--no-beta-banner', 'Hide the beta software banner');
 
 program
   .command('now [location]')
@@ -733,12 +751,17 @@ program
 // Handle default case - if arguments exist but don't match commands, treat as location
 const args = process.argv.slice(2);
 const knownCommands = ['now', 'forecast', '5day', 'compare', 'coords', 'config', 'cache', 'interactive', 'i', 'help', '--help', '-h', '--version', '-V'];
+const knownOptions = ['--no-beta-banner', '-u', '--units', '-f', '--forecast', '-a', '--alerts'];
 
 if (args.length === 0) {
   // No arguments, start interactive mode
+  showBetaBanner();
   interactiveMode();
-} else if (args.length > 0 && !knownCommands.includes(args[0]) && !args[0].startsWith('-')) {
+} else if (args.length > 0 && (!knownCommands.includes(args[0]) || args.includes('--no-beta-banner')) && args.filter(arg => !knownOptions.includes(arg) && !arg.match(/^(metric|imperial)$/)).length > 0) {
   // First argument is not a known command and doesn't start with -, treat as location for current weather
+  if (!args.includes('--no-beta-banner')) {
+    showBetaBanner();
+  }
   const location = args.join(' ');
   const units = args.includes('-u') || args.includes('--units') ? 
     (args[args.indexOf(args.includes('-u') ? '-u' : '--units') + 1] || 'metric') : 'metric';
@@ -746,7 +769,7 @@ if (args.length === 0) {
   const showAlerts = args.includes('-a') || args.includes('--alerts');
   
   try {
-    const cleanLocation = location.replace(/(-u|--units|metric|imperial|-f|--forecast|-a|--alerts)/g, '').trim();
+    const cleanLocation = location.replace(/(-u|--units|metric|imperial|-f|--forecast|-a|--alerts|--no-beta-banner)/g, '').trim();
     const data = await getWeather(cleanLocation, units);
     displayCurrentWeather(data.current, units);
     

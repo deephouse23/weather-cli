@@ -1,12 +1,25 @@
-# Weather CLI 🌤️
+# Weather CLI [BETA] 🌤️
 
-![Version](https://img.shields.io/badge/version-0.0.2-blue.svg)
+![Version](https://img.shields.io/badge/version-0.0.2--beta-orange.svg)
+![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
 
 A beautiful command-line weather application that provides current weather and forecasts for any location.
 
 **✨ Now with simplified global installation! Just type `weather london` from anywhere on your system.**
+
+## ⚠️ Beta Software
+
+**This project is currently in beta development.** While fully functional, please note:
+
+- 🚧 **Active Development**: Features and APIs may change between versions
+- 🐛 **Bug Reports Welcome**: If you encounter issues, please [report them](https://github.com/deephouse23/weather-cli/issues)
+- 💡 **Feedback Appreciated**: Your suggestions help improve the tool
+- 🤝 **Contributions Welcome**: Pull requests and feature requests are encouraged
+- 📋 **Stability**: Core weather functionality is stable, but CLI interface may evolve
+
+**We recommend trying it out and providing feedback to help us reach v1.0!**
 
 ## Features
 

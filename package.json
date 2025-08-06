@@ -1,13 +1,14 @@
 {
   "name": "weather-cli",
-  "version": "0.0.2",
-  "description": "A beautiful CLI weather application",
+  "version": "0.0.2-beta",
+  "description": "A beautiful CLI weather application (Beta)",
   "main": "index.js",
   "type": "module",
   "bin": {
     "weather": "./index.js"
   },
   "preferGlobal": true,
+  "stability": "beta",
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js"

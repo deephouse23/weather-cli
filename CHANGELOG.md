@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.2] - 2025-08-06
+## [0.0.2-beta] - 2025-08-06
+
+> **⚠️ Beta Release**: This version is under active development. While fully functional, features and APIs may change between versions. Feedback and contributions are welcome!
 
 ### Added
 - Global npm package installation support with `npm install -g .`
@@ -25,6 +27,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Command parsing now correctly handles location names as the default action
 - Improved error handling for command line arguments
 - Better handling of multi-word city names in simplified syntax
+
+### Known Limitations (Beta)
+- CLI interface may evolve based on user feedback
+- Some command patterns may change in future versions
+- Package not yet published to npm registry (manual installation required)
+
+### Upcoming Features
+- npm registry publication for easier installation
+- Additional weather data sources
+- Desktop notifications
+- Configuration improvements
 
 ## [0.0.1] - 2025-08-05
 

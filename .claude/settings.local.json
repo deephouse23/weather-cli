@@ -17,7 +17,9 @@
       "Bash(weather --version)",
       "Bash(ls:*)",
       "Bash(weather:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(git tag:*)",
+      "Bash(gh release create:*)"
     ],
     "deny": []
   }
