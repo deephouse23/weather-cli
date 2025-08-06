@@ -1,12 +1,13 @@
 {
   "name": "weather-cli",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "A beautiful CLI weather application",
   "main": "index.js",
   "type": "module",
   "bin": {
     "weather": "./index.js"
   },
+  "preferGlobal": true,
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js"
@@ -19,6 +20,14 @@
   ],
   "author": "deephouse23",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deephouse23/weather-cli.git"
+  },
+  "homepage": "https://github.com/deephouse23/weather-cli#readme",
+  "bugs": {
+    "url": "https://github.com/deephouse23/weather-cli/issues"
+  },
   "dependencies": {
     "axios": "^1.6.7",
     "chalk": "^5.3.0",

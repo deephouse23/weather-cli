@@ -1,16 +1,26 @@
 # Weather CLI 🌤️
 
+![Version](https://img.shields.io/badge/version-0.0.2-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
+
 A beautiful command-line weather application that provides current weather and forecasts for any location.
+
+**✨ Now with simplified global installation! Just type `weather london` from anywhere on your system.**
 
 ## Features
 
-- 🌡️ Current weather conditions
-- 📅 24-hour forecast
+- ⚡ **Simplified commands** - `weather london` (no need for `weather now london`)
+- 🌍 **Global installation** - Install once, use anywhere on your system
+- 🌡️ Current weather conditions with beautiful ASCII art
+- 📅 24-hour and 5-day forecasts
 - 🎨 Beautiful terminal UI with colors and emojis
 - 💾 Save default location and preferences
 - 🔄 Interactive mode with prompts
 - 🌍 Support for any city worldwide
-- 📊 Detailed weather metrics (humidity, pressure, wind speed)
+- 📊 Detailed weather metrics (humidity, pressure, wind speed, air quality)
+- ⚖️ Weather comparison between cities
+- 📍 GPS coordinates support
 
 ## Prerequisites
 
@@ -21,21 +31,27 @@ A beautiful command-line weather application that provides current weather and f
 
 ## Installation
 
-### Quick Setup (Copy & Paste)
+### 🚀 Quick Start (Global Installation)
+
+The easiest way to use Weather CLI is to install it globally. This gives you the `weather` command available system-wide:
 
 ```bash
-# Clone the repository
+# Clone and install globally
 git clone https://github.com/deephouse23/weather-cli.git
 cd weather-cli
+npm install && npm install -g .
 
-# Install dependencies
-npm install
-
-# Create your .env file
+# Set up your API key
 cp .env.example .env
+# Edit .env and add your OpenWeatherMap API key
 
-# Now edit .env and add your API key (see below)
+# Start using it immediately!
+weather london
+weather "new york" --forecast
+weather tokyo --units imperial
 ```
+
+**That's it! 🎉 The `weather` command is now available from any directory on your system.**
 
 ### Get Your API Key
 
@@ -49,72 +65,85 @@ cp .env.example .env
    WEATHER_API_KEY=put your key here bro
    ```
 
-### Verify Installation
+### ✅ Verify Installation
 
 Test that everything is working:
 ```bash
-node index.js now London
+weather london
 ```
 
-You should see weather data for London with colors and emojis!
+You should see weather data for London with colors and emojis! 🌈
+
+If you get an API error, make sure you've added your OpenWeatherMap API key to the `.env` file.
 
 ## Usage
 
-### Running the Application
+### Quick Start
 
-This is a local CLI tool that runs in your terminal. No server or deployment needed!
+After global installation, you can use the `weather` command from anywhere:
 
-### Interactive Mode (Default)
-Just run the command without arguments:
 ```bash
-node index.js
-```
-Or:
-```bash
-npm start
-```
+# Get current weather (shorthand)
+weather london
+weather "new york"
+weather tokyo --units imperial
 
-This will prompt you for location and preferences.
-
-### Current Weather
-```bash
-node index.js now London
-node index.js now "New York" --units imperial
-node index.js now Tokyo --forecast
-```
-
-### Forecast
-```bash
-node index.js forecast Paris
-node index.js forecast Berlin --units imperial
-```
-
-### Configure Defaults
-```bash
-node index.js config
-```
-
-### Global Installation (Optional)
-To use the `weather` command globally:
-```bash
-npm link
-```
-
-Then you can use:
-```bash
+# Interactive mode (no arguments)
 weather
-weather now London
-weather forecast Tokyo
+
+# Current weather with forecast
+weather london --forecast
+
+# 24-hour forecast
+weather forecast paris
+
+# Configure defaults
+weather config
+```
+
+### All Commands
+
+```bash
+# Current weather (default command)
+weather london
+weather "san francisco" --units imperial
+weather tokyo --forecast --alerts
+
+# Interactive mode
+weather
+weather interactive
+
+# Forecasts
+weather forecast berlin
+weather 5day miami
+
+# Other commands
+weather compare london paris
+weather coords 40.7128,-74.0060
+weather config
+weather cache --clear
+```
+
+### Development Mode
+If you're developing or haven't installed globally:
+```bash
+node index.js london
+npm start
 ```
 
 ## Commands
 
 | Command | Description | Options |
 |---------|-------------|---------|
-| `now [location]` | Get current weather | `--units`, `--forecast` |
+| `[location]` | Get current weather (default) | `--units`, `--forecast`, `--alerts` |
+| `now [location]` | Get current weather | `--units`, `--forecast`, `--alerts` |
 | `forecast [location]` | Get 24-hour forecast | `--units` |
+| `5day [location]` | Get 5-day forecast | `--units` |
+| `compare <city1> <city2>` | Compare weather between cities | `--units` |
+| `coords <lat,lon>` | Weather by GPS coordinates | `--units` |
 | `config` | Set default location and units | - |
 | `interactive` or `i` | Interactive mode with prompts | - |
+| `cache` | View/clear cache | `--clear` |
 
 ## Options
 
@@ -126,19 +155,20 @@ weather forecast Tokyo
 ## Examples
 
 ```bash
-# Current weather in London
-weather now London
+# Current weather (simplified commands)
+weather london
+weather "new york" --units imperial
+weather tokyo --forecast
 
-# Current weather in New York with Fahrenheit
-weather now "New York" --units imperial
-
-# 24-hour forecast for Tokyo
-weather forecast Tokyo
-
-# Current weather with forecast
-weather now Paris --forecast
+# All other commands still work
+weather now london
+weather forecast tokyo
+weather 5day berlin --units imperial
+weather compare london paris
+weather coords 51.5074,-0.1278
 
 # Interactive mode
+weather
 weather i
 ```
 

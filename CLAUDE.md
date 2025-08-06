@@ -10,15 +10,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev` - Run in development mode with auto-restart using `node --watch index.js`
 
 ### Running the CLI
+
+#### Global Installation (Recommended)
+After `npm install -g .`:
+- `weather` - Interactive mode by default
+- `weather <location>` - Get current weather (simplified)
+- `weather london` - Current weather for London
+- `weather "new york"` - Current weather for New York
+- `weather forecast [location]` - Get 24-hour forecast  
+- `weather 5day [location]` - Get 5-day forecast
+- `weather compare <city1> <city2>` - Compare weather between two cities
+- `weather coords <lat,lon>` - Get weather by GPS coordinates
+- `weather config` - Configure default settings
+- `weather cache` - View cache status or clear with `-c` flag
+
+#### Local Development
 - `node index.js` - Runs interactive mode by default
-- `node index.js interactive` or `node index.js i` - Interactive mode with prompts
+- `node index.js london` - Get current weather for London
 - `node index.js now [location]` - Get current weather
 - `node index.js forecast [location]` - Get 24-hour forecast  
 - `node index.js 5day [location]` - Get 5-day forecast
-- `node index.js compare <city1> <city2>` - Compare weather between two cities
-- `node index.js coords <lat,lon>` - Get weather by GPS coordinates
-- `node index.js config` - Configure default settings
-- `node index.js cache` - View cache status or clear with `-c` flag
 
 ### Common CLI Options
 - `-u metric|imperial` - Temperature units (default: metric)

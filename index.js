@@ -591,7 +591,7 @@ async function interactiveMode() {
 program
   .name('weather')
   .description('A beautiful CLI weather application')
-  .version('1.0.0');
+  .version('0.0.2');
 
 program
   .command('now [location]')
@@ -730,9 +730,38 @@ program
   .description('Interactive mode with prompts')
   .action(interactiveMode);
 
-// Default action (no command specified)
-if (process.argv.length === 2) {
+// Handle default case - if arguments exist but don't match commands, treat as location
+const args = process.argv.slice(2);
+const knownCommands = ['now', 'forecast', '5day', 'compare', 'coords', 'config', 'cache', 'interactive', 'i', 'help', '--help', '-h', '--version', '-V'];
+
+if (args.length === 0) {
+  // No arguments, start interactive mode
   interactiveMode();
+} else if (args.length > 0 && !knownCommands.includes(args[0]) && !args[0].startsWith('-')) {
+  // First argument is not a known command and doesn't start with -, treat as location for current weather
+  const location = args.join(' ');
+  const units = args.includes('-u') || args.includes('--units') ? 
+    (args[args.indexOf(args.includes('-u') ? '-u' : '--units') + 1] || 'metric') : 'metric';
+  const showForecast = args.includes('-f') || args.includes('--forecast');
+  const showAlerts = args.includes('-a') || args.includes('--alerts');
+  
+  try {
+    const cleanLocation = location.replace(/(-u|--units|metric|imperial|-f|--forecast|-a|--alerts)/g, '').trim();
+    const data = await getWeather(cleanLocation, units);
+    displayCurrentWeather(data.current, units);
+    
+    if (showAlerts) {
+      displayAlerts(data);
+    }
+    
+    if (showForecast) {
+      display24HourForecast(data.forecast, units);
+    }
+  } catch (error) {
+    console.error(chalk.red(`❌ ${error.message}`));
+    process.exit(1);
+  }
 } else {
+  // Parse as normal commander commands
   program.parse();
 }
