@@ -19,13 +19,13 @@
     "terminal",
     "forecast"
   ],
-  "author": "deephouse23",
+  "author": "16bitweather <justinelrod111@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/deephouse23/weather-cli.git"
   },
-  "homepage": "https://github.com/deephouse23/weather-cli#readme",
+  "homepage": "https://16bitweather.co",
   "bugs": {
     "url": "https://github.com/deephouse23/weather-cli/issues"
   },

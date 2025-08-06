@@ -226,7 +226,7 @@ Future releases may include:
 - Commander.js for CLI parsing
 - Chalk, Boxen, Inquirer for beautiful terminal UI
 
-**Built by:** deephouse23  
+**Built by:** 16bitweather  
 **Generated with:** [Claude Code](https://claude.ai/code)
 
 ---

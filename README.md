@@ -1,13 +1,20 @@
 # Weather CLI [BETA] 🌤️
 
-![Version](https://img.shields.io/badge/version-0.0.2--beta-orange.svg)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Version](https://img.shields.io/badge/version-0.0.2--beta-orange)
+![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
+
+Part of the 16bitweather suite of weather tools
 
 A beautiful command-line weather application that provides current weather and forecasts for any location.
 
 **✨ Now with simplified global installation! Just type `weather london` from anywhere on your system.**
+
+## About 16bitweather
+
+This CLI is part of the 16bitweather ecosystem. Check out our web app at [16bitweather.co](https://16bitweather.co) for a full-featured weather experience.
 
 ## ⚠️ Beta Software
 
@@ -223,11 +230,11 @@ Feel free to fork and improve! Some ideas:
 
 ## License
 
-MIT
+MIT License - see [LICENSE](LICENSE) file for details. Created by 16bitweather.
 
 ## Author
 
-deephouse23
+16bitweather
 
 ---
 
