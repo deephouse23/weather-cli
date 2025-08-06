@@ -1,6 +1,6 @@
 {
   "name": "weather-cli",
-  "version": "0.0.2-beta",
+  "version": "0.0.21",
   "description": "A beautiful CLI weather application (Beta)",
   "main": "index.js",
   "type": "module",
