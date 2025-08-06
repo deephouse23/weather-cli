@@ -1,0 +1,31 @@
+{
+  "name": "weather-cli",
+  "version": "1.0.0",
+  "description": "A beautiful CLI weather application",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "weather": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": [
+    "weather",
+    "cli",
+    "terminal",
+    "forecast"
+  ],
+  "author": "deephouse23",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.1",
+    "ora": "^8.0.1",
+    "boxen": "^7.1.1",
+    "inquirer": "^9.2.15"
+  }
+}
