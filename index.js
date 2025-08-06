@@ -25,7 +25,7 @@ function showBetaBanner() {
 ╔══════════════════════════════════════╗
 ║              BETA SOFTWARE           ║
 ║                                      ║
-║    Weather CLI v0.0.2-beta           ║
+║    Weather CLI v0.0.22               ║
 ║    Under active development          ║
 ║                                      ║
 ║    Feedback & bugs welcome at:       ║
@@ -54,6 +54,67 @@ const weatherEmojis = {
   Fog: '🌫️',
   Haze: '🌫️'
 };
+
+// Regional temperature units mapping
+const FAHRENHEIT_COUNTRIES = new Set([
+  'US', 'USA', 'BS', 'BZ', 'KY', 'PW'  // US, Bahamas, Belize, Cayman Islands, Palau
+]);
+
+// Temperature conversion utilities
+function celsiusToFahrenheit(celsius) {
+  return (celsius * 9/5) + 32;
+}
+
+function fahrenheitToCelsius(fahrenheit) {
+  return (fahrenheit - 32) * 5/9;
+}
+
+// Detect regional temperature unit preference
+function getRegionalTempUnit(countryCode) {
+  return FAHRENHEIT_COUNTRIES.has(countryCode?.toUpperCase()) ? 'fahrenheit' : 'celsius';
+}
+
+// Convert temperature between units
+function convertTemperature(temp, fromUnit, toUnit) {
+  if (fromUnit === toUnit) return temp;
+  
+  if (fromUnit === 'celsius' && toUnit === 'fahrenheit') {
+    return celsiusToFahrenheit(temp);
+  } else if (fromUnit === 'fahrenheit' && toUnit === 'celsius') {
+    return fahrenheitToCelsius(temp);
+  }
+  
+  return temp;
+}
+
+// Determine display unit system
+function determineDisplayUnits(countryCode, userPreference = null) {
+  // Manual override takes precedence
+  if (userPreference === 'fahrenheit' || userPreference === 'imperial') {
+    return { api: 'imperial', display: 'fahrenheit' };
+  }
+  if (userPreference === 'celsius' || userPreference === 'metric') {
+    return { api: 'metric', display: 'celsius' };
+  }
+  
+  // Auto-detect based on country
+  const regionalUnit = getRegionalTempUnit(countryCode);
+  return {
+    api: regionalUnit === 'fahrenheit' ? 'imperial' : 'metric',
+    display: regionalUnit
+  };
+}
+
+// Process CLI options for temperature units
+function processTemperatureOptions(options) {
+  if (options.celsius) {
+    return 'celsius';
+  }
+  if (options.fahrenheit) {
+    return 'fahrenheit';
+  }
+  return options.units === 'auto' ? null : options.units;
+}
 
 // ASCII art for weather conditions
 const weatherASCII = {
@@ -160,7 +221,7 @@ async function saveConfig(config) {
 }
 
 // Get location by coordinates
-async function getWeatherByCoords(lat, lon, units = 'metric') {
+async function getWeatherByCoords(lat, lon, userUnits = null) {
   if (!API_KEY) {
     console.error(chalk.red('❌ No API key found. Please set WEATHER_API_KEY in your .env file'));
     console.log(chalk.yellow('Get your free API key at: https://openweathermap.org/api'));
@@ -170,15 +231,32 @@ async function getWeatherByCoords(lat, lon, units = 'metric') {
   const spinner = ora('Fetching weather data...').start();
   
   try {
-    // Get current weather
+    // Get current weather (metric first to determine country)
     const weatherResponse = await axios.get(`${BASE_URL}/weather`, {
       params: {
         lat,
         lon,
         appid: API_KEY,
-        units: units
+        units: 'metric'
       }
     });
+
+    const countryCode = weatherResponse.data.sys.country;
+    const unitSystem = determineDisplayUnits(countryCode, userUnits);
+    
+    // Get final weather data in correct units
+    let finalWeatherData = weatherResponse.data;
+    if (unitSystem.api !== 'metric') {
+      const weatherResponseFinal = await axios.get(`${BASE_URL}/weather`, {
+        params: {
+          lat,
+          lon,
+          appid: API_KEY,
+          units: unitSystem.api
+        }
+      });
+      finalWeatherData = weatherResponseFinal.data;
+    }
 
     // Get 5-day forecast
     const forecastResponse = await axios.get(`${BASE_URL}/forecast`, {
@@ -186,7 +264,7 @@ async function getWeatherByCoords(lat, lon, units = 'metric') {
         lat,
         lon,
         appid: API_KEY,
-        units: units
+        units: unitSystem.api
       }
     });
 
@@ -199,11 +277,13 @@ async function getWeatherByCoords(lat, lon, units = 'metric') {
       }
     });
 
-    spinner.succeed('Weather data fetched!');
+    spinner.succeed(`Weather data fetched! Using ${unitSystem.display === 'fahrenheit' ? 'Fahrenheit' : 'Celsius'} for ${countryCode}`);
     return {
-      current: weatherResponse.data,
+      current: finalWeatherData,
       forecast: forecastResponse.data,
-      pollution: pollutionResponse.data
+      pollution: pollutionResponse.data,
+      displayUnit: unitSystem.display,
+      countryCode: countryCode
     };
   } catch (error) {
     spinner.fail('Failed to fetch weather data');
@@ -213,15 +293,16 @@ async function getWeatherByCoords(lat, lon, units = 'metric') {
 }
 
 // Fetch weather data
-async function getWeather(location, units = 'metric') {
+async function getWeather(location, userUnits = null) {
   if (!API_KEY) {
     console.error(chalk.red('❌ No API key found. Please set WEATHER_API_KEY in your .env file'));
     console.log(chalk.yellow('Get your free API key at: https://openweathermap.org/api'));
     process.exit(1);
   }
 
-  // Check cache first
-  const cached = await getCachedWeather(location, units);
+  // Check cache first (with user units preference)
+  const cacheKey = userUnits || 'auto';
+  const cached = await getCachedWeather(location, cacheKey);
   if (cached) {
     console.log(chalk.gray('📦 Using cached data...'));
     return cached;
@@ -230,43 +311,63 @@ async function getWeather(location, units = 'metric') {
   const spinner = ora('Fetching weather data...').start();
   
   try {
-    // Get current weather
+    // First, get location info to determine regional preferences
     const weatherResponse = await axios.get(`${BASE_URL}/weather`, {
       params: {
         q: location,
         appid: API_KEY,
-        units: units
+        units: 'metric' // Always fetch in metric first to get country code
       }
     });
+
+    const countryCode = weatherResponse.data.sys.country;
+    const unitSystem = determineDisplayUnits(countryCode, userUnits);
+    
+    // If we need different units than metric, fetch again
+    let finalWeatherData = weatherResponse.data;
+    let forecastData, pollutionData;
+    
+    if (unitSystem.api !== 'metric') {
+      const weatherResponseFinal = await axios.get(`${BASE_URL}/weather`, {
+        params: {
+          q: location,
+          appid: API_KEY,
+          units: unitSystem.api
+        }
+      });
+      finalWeatherData = weatherResponseFinal.data;
+    }
 
     // Get 5-day forecast
     const forecastResponse = await axios.get(`${BASE_URL}/forecast`, {
       params: {
         q: location,
         appid: API_KEY,
-        units: units
+        units: unitSystem.api
       }
     });
 
     // Get air pollution data for alerts
     const pollutionResponse = await axios.get(`${BASE_URL}/air_pollution`, {
       params: {
-        lat: weatherResponse.data.coord.lat,
-        lon: weatherResponse.data.coord.lon,
+        lat: finalWeatherData.coord.lat,
+        lon: finalWeatherData.coord.lon,
         appid: API_KEY
       }
     });
 
-    spinner.succeed('Weather data fetched!');
+    spinner.succeed(`Weather data fetched! Using ${unitSystem.display === 'fahrenheit' ? 'Fahrenheit' : 'Celsius'} for ${countryCode}`);
     
     const data = {
-      current: weatherResponse.data,
+      current: finalWeatherData,
       forecast: forecastResponse.data,
-      pollution: pollutionResponse.data
+      pollution: pollutionResponse.data,
+      displayUnit: unitSystem.display,
+      countryCode: countryCode
     };
 
     // Cache the data
-    await setCachedWeather(location, units, data);
+    await setCachedWeather(location, cacheKey, data);
     
     return data;
   } catch (error) {
@@ -283,8 +384,8 @@ async function getWeather(location, units = 'metric') {
 }
 
 // Format temperature
-function formatTemp(temp, units) {
-  const unit = units === 'metric' ? '°C' : '°F';
+function formatTemp(temp, displayUnit) {
+  const unit = displayUnit === 'fahrenheit' ? '°F' : '°C';
   return `${Math.round(temp)}${unit}`;
 }
 
@@ -341,7 +442,7 @@ function displayASCIIArt(weatherMain) {
 }
 
 // Display current weather
-function displayCurrentWeather(data, units) {
+function displayCurrentWeather(data, displayUnit) {
   const { name, sys, main, weather, wind, clouds } = data;
   const emoji = weatherEmojis[weather[0].main] || '🌈';
   
@@ -354,14 +455,14 @@ ${chalk.cyan.bold(`${name}, ${sys.country}`)} ${emoji}
 ${chalk.yellow('Current Conditions:')}
 ${weather[0].description.charAt(0).toUpperCase() + weather[0].description.slice(1)}
 
-${chalk.blue('Temperature:')} ${formatTemp(main.temp, units)}
-${chalk.gray('Feels like:')} ${formatTemp(main.feels_like, units)}
-${chalk.gray('Min/Max:')} ${formatTemp(main.temp_min, units)} / ${formatTemp(main.temp_max, units)}
+${chalk.blue('Temperature:')} ${formatTemp(main.temp, displayUnit)}
+${chalk.gray('Feels like:')} ${formatTemp(main.feels_like, displayUnit)}
+${chalk.gray('Min/Max:')} ${formatTemp(main.temp_min, displayUnit)} / ${formatTemp(main.temp_max, displayUnit)}
 
 ${chalk.cyan('🌡️  Pressure:')} ${main.pressure} hPa
 ${chalk.cyan('💧 Humidity:')} ${main.humidity}%
 ${chalk.cyan('☁️  Clouds:')} ${clouds.all}%
-${chalk.cyan('💨 Wind:')} ${wind.speed} ${units === 'metric' ? 'm/s' : 'mph'}
+${chalk.cyan('💨 Wind:')} ${wind.speed} ${displayUnit === 'fahrenheit' ? 'mph' : 'm/s'}
   `;
 
   console.log(boxen(output.trim(), {
@@ -376,7 +477,7 @@ ${chalk.cyan('💨 Wind:')} ${wind.speed} ${units === 'metric' ? 'm/s' : 'mph'}
 }
 
 // Display 5-day forecast
-function display5DayForecast(data, units) {
+function display5DayForecast(data, displayUnit) {
   console.log(chalk.yellow.bold('\n📅 5-Day Forecast:\n'));
   
   // Group by day
@@ -401,7 +502,7 @@ function display5DayForecast(data, units) {
     console.log(
       chalk.gray('  '),
       emoji,
-      chalk.blue(formatTemp(avgTemp, units)),
+      chalk.blue(formatTemp(avgTemp, displayUnit)),
       chalk.gray(weather.description)
     );
     
@@ -409,13 +510,13 @@ function display5DayForecast(data, units) {
     const temps = items.map(item => item.main.temp);
     const min = Math.min(...temps);
     const max = Math.max(...temps);
-    console.log(chalk.gray(`    Min: ${formatTemp(min, units)} | Max: ${formatTemp(max, units)}`));
+    console.log(chalk.gray(`    Min: ${formatTemp(min, displayUnit)} | Max: ${formatTemp(max, displayUnit)}`));
     console.log('');
   });
 }
 
 // Display 24-hour forecast
-function display24HourForecast(data, units) {
+function display24HourForecast(data, displayUnit) {
   console.log(chalk.yellow.bold('\n📅 Next 24 Hours Forecast:\n'));
   
   data.list.slice(0, 8).forEach(item => {
@@ -430,30 +531,31 @@ function display24HourForecast(data, units) {
     console.log(
       chalk.gray(time.padEnd(10)),
       emoji,
-      chalk.blue(formatTemp(item.main.temp, units).padEnd(6)),
+      chalk.blue(formatTemp(item.main.temp, displayUnit).padEnd(6)),
       chalk.gray(item.weather[0].description)
     );
   });
 }
 
 // Compare weather between two cities
-async function compareWeather(city1, city2, units = 'metric') {
+async function compareWeather(city1, city2, userUnits = null) {
   console.log(chalk.yellow.bold(`\n🔍 Comparing weather: ${city1} vs ${city2}\n`));
   
   try {
     const [data1, data2] = await Promise.all([
-      getWeather(city1, units),
-      getWeather(city2, units)
+      getWeather(city1, userUnits),
+      getWeather(city2, userUnits)
     ]);
 
     const city1Data = data1.current;
     const city2Data = data2.current;
+    const displayUnit = data1.displayUnit;
 
     console.log(boxen(`
 ${chalk.cyan.bold(city1Data.name)} ${weatherEmojis[city1Data.weather[0].main] || '🌈'}
-${chalk.blue('Temperature:')} ${formatTemp(city1Data.main.temp, units)}
+${chalk.blue('Temperature:')} ${formatTemp(city1Data.main.temp, displayUnit)}
 ${chalk.gray('Humidity:')} ${city1Data.main.humidity}%
-${chalk.gray('Wind:')} ${city1Data.wind.speed} ${units === 'metric' ? 'm/s' : 'mph'}
+${chalk.gray('Wind:')} ${city1Data.wind.speed} ${displayUnit === 'fahrenheit' ? 'mph' : 'm/s'}
 ${chalk.gray('Conditions:')} ${city1Data.weather[0].description}
     `.trim(), {
       padding: 1,
@@ -464,9 +566,9 @@ ${chalk.gray('Conditions:')} ${city1Data.weather[0].description}
 
     console.log(boxen(`
 ${chalk.cyan.bold(city2Data.name)} ${weatherEmojis[city2Data.weather[0].main] || '🌈'}
-${chalk.blue('Temperature:')} ${formatTemp(city2Data.main.temp, units)}
+${chalk.blue('Temperature:')} ${formatTemp(city2Data.main.temp, displayUnit)}
 ${chalk.gray('Humidity:')} ${city2Data.main.humidity}%
-${chalk.gray('Wind:')} ${city2Data.wind.speed} ${units === 'metric' ? 'm/s' : 'mph'}
+${chalk.gray('Wind:')} ${city2Data.wind.speed} ${displayUnit === 'fahrenheit' ? 'mph' : 'm/s'}
 ${chalk.gray('Conditions:')} ${city2Data.weather[0].description}
     `.trim(), {
       padding: 1,
@@ -481,7 +583,7 @@ ${chalk.gray('Conditions:')} ${city2Data.weather[0].description}
     const diff = Math.abs(tempDiff);
     
     console.log(chalk.yellow.bold(`\n🌡️  Temperature Difference:`));
-    console.log(chalk.gray(`${warmer} is ${formatTemp(diff, units)} warmer`));
+    console.log(chalk.gray(`${warmer} is ${formatTemp(diff, displayUnit)} warmer`));
 
   } catch (error) {
     console.error(chalk.red('❌ Error comparing weather:', error.message));
@@ -526,14 +628,16 @@ async function interactiveMode() {
         name: 'units',
         message: 'Choose temperature units:',
         choices: [
-          { name: 'Celsius (°C)', value: 'metric' },
-          { name: 'Fahrenheit (°F)', value: 'imperial' }
+          { name: 'Auto (based on location)', value: 'auto' },
+          { name: 'Celsius (°C)', value: 'celsius' },
+          { name: 'Fahrenheit (°F)', value: 'fahrenheit' }
         ],
-        default: config.defaultUnits || 'metric'
+        default: config.defaultUnits || 'auto'
       }
     ]);
     
-    await compareWeather(compareAnswers.city1, compareAnswers.city2, compareAnswers.units);
+    const userUnits = compareAnswers.units === 'auto' ? null : compareAnswers.units;
+    await compareWeather(compareAnswers.city1, compareAnswers.city2, userUnits);
     return;
   }
 
@@ -556,15 +660,17 @@ async function interactiveMode() {
         name: 'units',
         message: 'Choose temperature units:',
         choices: [
-          { name: 'Celsius (°C)', value: 'metric' },
-          { name: 'Fahrenheit (°F)', value: 'imperial' }
+          { name: 'Auto (based on location)', value: 'auto' },
+          { name: 'Celsius (°C)', value: 'celsius' },
+          { name: 'Fahrenheit (°F)', value: 'fahrenheit' }
         ],
-        default: config.defaultUnits || 'metric'
+        default: config.defaultUnits || 'auto'
       }
     ]);
     
-    const data = await getWeatherByCoords(coordsAnswers.lat, coordsAnswers.lon, coordsAnswers.units);
-    displayCurrentWeather(data.current, coordsAnswers.units);
+    const userUnits = coordsAnswers.units === 'auto' ? null : coordsAnswers.units;
+    const data = await getWeatherByCoords(coordsAnswers.lat, coordsAnswers.lon, userUnits);
+    displayCurrentWeather(data.current, data.displayUnit);
     displayAlerts(data);
     return;
   }
@@ -588,18 +694,19 @@ async function interactiveMode() {
     }
   ]);
 
-  const data = await getWeather(locationAnswers.location, locationAnswers.units);
+  const userUnits = locationAnswers.units === 'auto' ? null : locationAnswers.units;
+  const data = await getWeather(locationAnswers.location, userUnits);
   
   if (answers.mode === 'current') {
-    displayCurrentWeather(data.current, locationAnswers.units);
+    displayCurrentWeather(data.current, data.displayUnit);
     displayAlerts(data);
   } else if (answers.mode === '24h') {
-    displayCurrentWeather(data.current, locationAnswers.units);
-    display24HourForecast(data.forecast, locationAnswers.units);
+    displayCurrentWeather(data.current, data.displayUnit);
+    display24HourForecast(data.forecast, data.displayUnit);
     displayAlerts(data);
   } else if (answers.mode === '5day') {
-    displayCurrentWeather(data.current, locationAnswers.units);
-    display5DayForecast(data.forecast, locationAnswers.units);
+    displayCurrentWeather(data.current, data.displayUnit);
+    display5DayForecast(data.forecast, data.displayUnit);
     displayAlerts(data);
   }
 }
@@ -608,13 +715,15 @@ async function interactiveMode() {
 program
   .name('weather')
   .description('A beautiful CLI weather application')
-  .version('0.0.2-beta')
+  .version('0.0.22')
   .option('--no-beta-banner', 'Hide the beta software banner');
 
 program
   .command('now [location]')
   .description('Get current weather for a location')
-  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial/celsius/fahrenheit)', 'auto')
+  .option('--celsius', 'Force Celsius temperature display')
+  .option('--fahrenheit', 'Force Fahrenheit temperature display')
   .option('-f, --forecast', 'Include 24-hour forecast')
   .option('-a, --alerts', 'Show weather alerts')
   .action(async (location, options) => {
@@ -627,22 +736,25 @@ program
       }
     }
     
-    const data = await getWeather(location, options.units);
-    displayCurrentWeather(data.current, options.units);
+    const userUnits = processTemperatureOptions(options);
+    const data = await getWeather(location, userUnits);
+    displayCurrentWeather(data.current, data.displayUnit);
     
     if (options.alerts) {
       displayAlerts(data);
     }
     
     if (options.forecast) {
-      display24HourForecast(data.forecast, options.units);
+      display24HourForecast(data.forecast, data.displayUnit);
     }
   });
 
 program
   .command('forecast [location]')
   .description('Get 24-hour forecast for a location')
-  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial/celsius/fahrenheit)', 'auto')
+  .option('--celsius', 'Force Celsius temperature display')
+  .option('--fahrenheit', 'Force Fahrenheit temperature display')
   .action(async (location, options) => {
     if (!location) {
       const config = await loadConfig();
@@ -653,16 +765,19 @@ program
       }
     }
     
-    const data = await getWeather(location, options.units);
-    displayCurrentWeather(data.current, options.units);
-    display24HourForecast(data.forecast, options.units);
+    const userUnits = processTemperatureOptions(options);
+    const data = await getWeather(location, userUnits);
+    displayCurrentWeather(data.current, data.displayUnit);
+    display24HourForecast(data.forecast, data.displayUnit);
     displayAlerts(data);
   });
 
 program
   .command('5day [location]')
   .description('Get 5-day forecast for a location')
-  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial/celsius/fahrenheit)', 'auto')
+  .option('--celsius', 'Force Celsius temperature display')
+  .option('--fahrenheit', 'Force Fahrenheit temperature display')
   .action(async (location, options) => {
     if (!location) {
       const config = await loadConfig();
@@ -673,32 +788,39 @@ program
       }
     }
     
-    const data = await getWeather(location, options.units);
-    displayCurrentWeather(data.current, options.units);
-    display5DayForecast(data.forecast, options.units);
+    const userUnits = processTemperatureOptions(options);
+    const data = await getWeather(location, userUnits);
+    displayCurrentWeather(data.current, data.displayUnit);
+    display5DayForecast(data.forecast, data.displayUnit);
     displayAlerts(data);
   });
 
 program
   .command('compare <city1> <city2>')
   .description('Compare weather between two cities')
-  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial/celsius/fahrenheit)', 'auto')
+  .option('--celsius', 'Force Celsius temperature display')
+  .option('--fahrenheit', 'Force Fahrenheit temperature display')
   .action(async (city1, city2, options) => {
-    await compareWeather(city1, city2, options.units);
+    const userUnits = processTemperatureOptions(options);
+    await compareWeather(city1, city2, userUnits);
   });
 
 program
   .command('coords <coordinates>')
   .description('Get weather by GPS coordinates (format: lat,lon)')
-  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial/celsius/fahrenheit)', 'auto')
+  .option('--celsius', 'Force Celsius temperature display')
+  .option('--fahrenheit', 'Force Fahrenheit temperature display')
   .action(async (coordinates, options) => {
     const [lat, lon] = coordinates.split(',').map(coord => parseFloat(coord.trim()));
     if (isNaN(lat) || isNaN(lon)) {
       console.error(chalk.red('❌ Invalid coordinates format. Use: lat,lon (e.g., 40.7128,-74.0060)'));
       process.exit(1);
     }
-    const data = await getWeatherByCoords(lat, lon, options.units);
-    displayCurrentWeather(data.current, options.units);
+    const userUnits = processTemperatureOptions(options);
+    const data = await getWeatherByCoords(lat, lon, userUnits);
+    displayCurrentWeather(data.current, data.displayUnit);
     displayAlerts(data);
   });
 
@@ -717,8 +839,9 @@ program
         name: 'defaultUnits',
         message: 'Default temperature units:',
         choices: [
-          { name: 'Celsius (°C)', value: 'metric' },
-          { name: 'Fahrenheit (°F)', value: 'imperial' }
+          { name: 'Auto (based on location)', value: 'auto' },
+          { name: 'Celsius (°C)', value: 'celsius' },
+          { name: 'Fahrenheit (°F)', value: 'fahrenheit' }
         ]
       }
     ]);
@@ -751,34 +874,42 @@ program
 // Handle default case - if arguments exist but don't match commands, treat as location
 const args = process.argv.slice(2);
 const knownCommands = ['now', 'forecast', '5day', 'compare', 'coords', 'config', 'cache', 'interactive', 'i', 'help', '--help', '-h', '--version', '-V'];
-const knownOptions = ['--no-beta-banner', '-u', '--units', '-f', '--forecast', '-a', '--alerts'];
+const knownOptions = ['--no-beta-banner', '-u', '--units', '-f', '--forecast', '-a', '--alerts', '--celsius', '--fahrenheit'];
 
 if (args.length === 0) {
   // No arguments, start interactive mode
   showBetaBanner();
   interactiveMode();
-} else if (args.length > 0 && (!knownCommands.includes(args[0]) || args.includes('--no-beta-banner')) && args.filter(arg => !knownOptions.includes(arg) && !arg.match(/^(metric|imperial)$/)).length > 0) {
+} else if (args.length > 0 && (!knownCommands.includes(args[0]) || args.includes('--no-beta-banner')) && args.filter(arg => !knownOptions.includes(arg) && !arg.match(/^(metric|imperial|celsius|fahrenheit|auto)$/)).length > 0) {
   // First argument is not a known command and doesn't start with -, treat as location for current weather
   if (!args.includes('--no-beta-banner')) {
     showBetaBanner();
   }
   const location = args.join(' ');
-  const units = args.includes('-u') || args.includes('--units') ? 
-    (args[args.indexOf(args.includes('-u') ? '-u' : '--units') + 1] || 'metric') : 'metric';
+  
+  // Process temperature options
+  const options = {
+    celsius: args.includes('--celsius'),
+    fahrenheit: args.includes('--fahrenheit'),
+    units: args.includes('-u') || args.includes('--units') ? 
+      (args[args.indexOf(args.includes('-u') ? '-u' : '--units') + 1] || 'auto') : 'auto'
+  };
+  const userUnits = processTemperatureOptions(options);
+  
   const showForecast = args.includes('-f') || args.includes('--forecast');
   const showAlerts = args.includes('-a') || args.includes('--alerts');
   
   try {
-    const cleanLocation = location.replace(/(-u|--units|metric|imperial|-f|--forecast|-a|--alerts|--no-beta-banner)/g, '').trim();
-    const data = await getWeather(cleanLocation, units);
-    displayCurrentWeather(data.current, units);
+    const cleanLocation = location.replace(/(-u|--units|metric|imperial|celsius|fahrenheit|auto|-f|--forecast|-a|--alerts|--celsius|--fahrenheit|--no-beta-banner)/g, '').trim();
+    const data = await getWeather(cleanLocation, userUnits);
+    displayCurrentWeather(data.current, data.displayUnit);
     
     if (showAlerts) {
       displayAlerts(data);
     }
     
     if (showForecast) {
-      display24HourForecast(data.forecast, units);
+      display24HourForecast(data.forecast, data.displayUnit);
     }
   } catch (error) {
     console.error(chalk.red(`❌ ${error.message}`));
