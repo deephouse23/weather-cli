@@ -36,8 +36,8 @@
 git check-ignore .env
 
 # ✅ No API keys in tracked files
-grep -r "13f0a3b6a8416fc07d138492777200ba" . --exclude-dir=node_modules
-# Only shows in .env (ignored) and SECURITY_REVIEW.md (just the grep command)
+grep -r "your_api_key_here" . --exclude-dir=node_modules
+# Should return no results
 
 # ✅ .env.example has placeholder
 cat .env.example

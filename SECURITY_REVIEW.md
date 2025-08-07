@@ -111,7 +111,7 @@ if (error.response?.status === 401) {
 git status --ignored
 
 # Check for any remaining API keys
-grep -r "13f0a3b6a8416fc07d138492777200ba" . --exclude-dir=node_modules
+grep -r "your_api_key_here" . --exclude-dir=node_modules
 
 # Should return no results
 ```
