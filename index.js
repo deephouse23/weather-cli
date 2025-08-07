@@ -10,12 +10,32 @@ import inquirer from 'inquirer';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs/promises';
-
-// Load environment variables
-dotenv.config();
+import { homedir } from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Load environment variables from multiple locations
+function loadEnvironmentVariables() {
+  const envPaths = [
+    join(homedir(), '.weather-cli.env'),
+    join(homedir(), '.config', 'weather-cli', '.env'),
+    join(__dirname, '.env'),
+    process.env
+  ];
+  
+  for (const envPath of envPaths) {
+    if (typeof envPath === 'string') {
+      try {
+        dotenv.config({ path: envPath });
+      } catch (error) {
+        // Silently continue to next path
+      }
+    }
+  }
+}
+
+loadEnvironmentVariables();
 
 // Beta banner function
 function showBetaBanner() {
@@ -25,7 +45,7 @@ function showBetaBanner() {
 ╔══════════════════════════════════════╗
 ║              BETA SOFTWARE           ║
 ║                                      ║
-║    Weather CLI v0.0.2-beta           ║
+║    Weather CLI v0.0.23-beta          ║
 ║    Under active development          ║
 ║                                      ║
 ║    Feedback & bugs welcome at:       ║
@@ -36,9 +56,28 @@ function showBetaBanner() {
 
 
 
-// Configuration
-const CONFIG_FILE = join(__dirname, '.weather-config.json');
-const CACHE_FILE = join(__dirname, '.weather-cache.json');
+// Configuration - Use user directories for global installation
+function getConfigPaths() {
+  const configDir = join(homedir(), '.config', 'weather-cli');
+  return {
+    CONFIG_FILE: join(configDir, 'config.json'),
+    CACHE_FILE: join(configDir, 'cache.json'),
+    CONFIG_DIR: configDir
+  };
+}
+
+const { CONFIG_FILE, CACHE_FILE, CONFIG_DIR } = getConfigPaths();
+
+// Ensure config directory exists
+async function ensureConfigDir() {
+  try {
+    await fs.mkdir(CONFIG_DIR, { recursive: true });
+  } catch (error) {
+    // Directory might already exist
+  }
+}
+
+ensureConfigDir();
 const API_KEY = process.env.WEATHER_API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
@@ -162,8 +201,13 @@ async function saveConfig(config) {
 // Get location by coordinates
 async function getWeatherByCoords(lat, lon, units = 'metric') {
   if (!API_KEY) {
-    console.error(chalk.red('❌ No API key found. Please set WEATHER_API_KEY in your .env file'));
-    console.log(chalk.yellow('Get your free API key at: https://openweathermap.org/api'));
+    console.error(chalk.red('❌ No API key found'));
+    console.log(chalk.yellow('\nTo set up your API key, you can either:'));
+    console.log(chalk.gray('1. Run: weather setup'));
+    console.log(chalk.gray('2. Set environment variable: WEATHER_API_KEY=your_key'));
+    console.log(chalk.gray('3. Create file: ~/.weather-cli.env with WEATHER_API_KEY=your_key'));
+    console.log(chalk.gray('4. Create file: ~/.config/weather-cli/.env with WEATHER_API_KEY=your_key'));
+    console.log(chalk.yellow('\nGet your free API key at: https://openweathermap.org/api'));
     process.exit(1);
   }
 
@@ -215,8 +259,13 @@ async function getWeatherByCoords(lat, lon, units = 'metric') {
 // Fetch weather data
 async function getWeather(location, units = 'metric') {
   if (!API_KEY) {
-    console.error(chalk.red('❌ No API key found. Please set WEATHER_API_KEY in your .env file'));
-    console.log(chalk.yellow('Get your free API key at: https://openweathermap.org/api'));
+    console.error(chalk.red('❌ No API key found'));
+    console.log(chalk.yellow('\nTo set up your API key, you can either:'));
+    console.log(chalk.gray('1. Run: weather setup'));
+    console.log(chalk.gray('2. Set environment variable: WEATHER_API_KEY=your_key'));
+    console.log(chalk.gray('3. Create file: ~/.weather-cli.env with WEATHER_API_KEY=your_key'));
+    console.log(chalk.gray('4. Create file: ~/.config/weather-cli/.env with WEATHER_API_KEY=your_key'));
+    console.log(chalk.yellow('\nGet your free API key at: https://openweathermap.org/api'));
     process.exit(1);
   }
 
@@ -608,7 +657,7 @@ async function interactiveMode() {
 program
   .name('weather')
   .description('A beautiful CLI weather application')
-  .version('0.0.2-beta')
+  .version('0.0.23-beta')
   .option('--no-beta-banner', 'Hide the beta software banner');
 
 program
@@ -728,6 +777,65 @@ program
   });
 
 program
+  .command('setup')
+  .description('Set up your API key for global access')
+  .action(async () => {
+    console.log(chalk.yellow.bold('\n🔧 Weather CLI Setup\n'));
+    console.log(chalk.gray('This will configure your OpenWeatherMap API key for global access.'));
+    console.log(chalk.gray('Get your free API key at: https://openweathermap.org/api\n'));
+    
+    const answers = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'apiKey',
+        message: 'Enter your OpenWeatherMap API key:',
+        validate: (input) => {
+          if (!input || input.trim().length === 0) {
+            return 'API key is required';
+          }
+          if (input.trim().length < 10) {
+            return 'API key seems too short. Please check your key.';
+          }
+          return true;
+        }
+      },
+      {
+        type: 'list',
+        name: 'location',
+        message: 'Where would you like to store your API key?',
+        choices: [
+          { 
+            name: 'Home directory (~/.weather-cli.env) - Recommended', 
+            value: join(homedir(), '.weather-cli.env') 
+          },
+          { 
+            name: 'Config directory (~/.config/weather-cli/.env)', 
+            value: join(homedir(), '.config', 'weather-cli', '.env') 
+          }
+        ]
+      }
+    ]);
+    
+    try {
+      // Ensure the directory exists
+      const envDir = dirname(answers.location);
+      await fs.mkdir(envDir, { recursive: true });
+      
+      // Write the API key to the selected file
+      const envContent = `WEATHER_API_KEY=${answers.apiKey.trim()}\n`;
+      await fs.writeFile(answers.location, envContent);
+      
+      console.log(chalk.green('\n✅ API key saved successfully!'));
+      console.log(chalk.gray(`Location: ${answers.location}`));
+      console.log(chalk.yellow('\n🎉 You can now use the weather command from anywhere!'));
+      console.log(chalk.gray('Try: weather london'));
+    } catch (error) {
+      console.error(chalk.red('\n❌ Failed to save API key:', error.message));
+      process.exit(1);
+    }
+  });
+
+program
   .command('cache')
   .description('Manage weather cache')
   .option('-c, --clear', 'Clear all cached data')
@@ -750,7 +858,7 @@ program
 
 // Handle default case - if arguments exist but don't match commands, treat as location
 const args = process.argv.slice(2);
-const knownCommands = ['now', 'forecast', '5day', 'compare', 'coords', 'config', 'cache', 'interactive', 'i', 'help', '--help', '-h', '--version', '-V'];
+const knownCommands = ['now', 'forecast', '5day', 'compare', 'coords', 'config', 'setup', 'cache', 'interactive', 'i', 'help', '--help', '-h', '--version', '-V'];
 const knownOptions = ['--no-beta-banner', '-u', '--units', '-f', '--forecast', '-a', '--alerts'];
 
 if (args.length === 0) {
