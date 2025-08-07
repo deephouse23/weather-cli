@@ -25,7 +25,7 @@ function showBetaBanner() {
 ╔══════════════════════════════════════╗
 ║              BETA SOFTWARE           ║
 ║                                      ║
-║    Weather CLI v0.0.2-beta           ║
+║    Weather CLI v0.0.23-beta          ║
 ║    Under active development          ║
 ║                                      ║
 ║    Feedback & bugs welcome at:       ║
@@ -608,7 +608,7 @@ async function interactiveMode() {
 program
   .name('weather')
   .description('A beautiful CLI weather application')
-  .version('0.0.2-beta')
+  .version('0.0.23-beta')
   .option('--no-beta-banner', 'Hide the beta software banner');
 
 program

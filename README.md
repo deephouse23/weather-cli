@@ -1,6 +1,6 @@
 # Weather CLI [BETA] 🌤️
 
-![Version](https://img.shields.io/badge/version-0.0.2--beta-orange.svg)
+![Version](https://img.shields.io/badge/version-0.0.23--beta-orange.svg)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
@@ -54,9 +54,10 @@ git clone https://github.com/deephouse23/weather-cli.git
 cd weather-cli
 npm install && npm install -g .
 
-# Set up your API key
+# Set up your API key (IMPORTANT: Keep it secure!)
 cp .env.example .env
 # Edit .env and add your OpenWeatherMap API key
+# NEVER commit your .env file to git!
 
 # Start using it immediately!
 weather london
@@ -73,10 +74,19 @@ weather tokyo --units imperial
 3. Go to "API Keys" in your account
 4. Copy your API key
 5. Open `.env` file in any text editor
-6. Replace `your_api_key_here` with your actual key:
+6. Replace `your_openweathermap_api_key_here` with your actual key:
    ```
-   WEATHER_API_KEY=put your key here bro
+   WEATHER_API_KEY=your_actual_api_key_here
    ```
+
+### 🔒 Security Notice
+
+**IMPORTANT**: Your API key is private and should NEVER be shared or committed to git!
+
+- ✅ The `.env` file is automatically excluded from git commits
+- ✅ Only commit `.env.example` (which contains no real keys)
+- ⚠️ If you accidentally commit a real API key, rotate it immediately at [OpenWeatherMap](https://openweathermap.org/api)
+- 🔐 Keep your `.env` file local and secure
 
 ### ✅ Verify Installation
 
