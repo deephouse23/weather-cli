@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.24] - 2025-01-07
+## [0.0.24] - 2025-01-07
 
 ### 🎨 **Added**
 - **Horizontal layout** with responsive design that adapts to terminal width
@@ -82,13 +82,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
-- **v0.2.24** (Current) - Major release with horizontal layout and modular architecture
+- **v0.0.24** (Current) - Major release with horizontal layout and modular architecture
 - **v0.0.23** - Security improvements and dependency updates
 - **v0.0.22** - Initial beta release with basic functionality
 
 ## Migration Guide
 
-### From v0.0.22 to v0.2.24
+### From v0.0.22 to v0.0.24
 
 **Breaking Changes:**
 1. **Location Format**: Now requires `"City, State"` format

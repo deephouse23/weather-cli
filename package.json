@@ -1,6 +1,6 @@
 {
   "name": "weather-cli",
-  "version": "0.2.24",
+  "version": "0.0.24",
   "description": "A beautiful CLI weather application with horizontal layout and enhanced features",
   "main": "index.js",
   "type": "module",
@@ -8,7 +8,7 @@
     "weather": "./index.js"
   },
   "preferGlobal": true,
-  "stability": "stable",
+  "stability": "beta",
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",

@@ -1,9 +1,9 @@
-# Weather CLI v0.2.24 🌤️
+# Weather CLI v0.0.24 🌤️
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.2.24-green)
+![Version](https://img.shields.io/badge/version-0.0.24-orange)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
-![Stable](https://img.shields.io/badge/status-stable-green.svg)
+![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
 
 Part of the 16bitweather suite of weather tools
@@ -12,7 +12,7 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 
 **✨ Now with simplified global installation! Just type `weather "City, State"` from anywhere on your system.**
 
-## 🆕 **What's New in v0.2.24**
+## 🆕 **What's New in v0.0.24**
 
 ### 🎨 **Horizontal Layout**
 - **Responsive design** that adapts to your terminal width
@@ -286,7 +286,7 @@ cp .env.example .env
 
 ## 📝 **Changelog**
 
-### **v0.2.24** (Latest)
+### **v0.0.24** (Latest)
 - ✨ **NEW**: Horizontal layout with responsive design
 - ✨ **NEW**: City, State format requirement
 - ✨ **NEW**: Modular architecture (4 focused modules)
@@ -297,8 +297,8 @@ cp .env.example .env
 - 🛠️ **DEVELOPMENT**: Better error handling and validation
 
 ### **Previous Versions**
-- v0.0.22: Initial beta release
 - v0.0.23: Security improvements
+- v0.0.22: Initial beta release
 
 ## 📄 **License**
 
