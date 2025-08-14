@@ -1,13 +1,11 @@
-import axios from 'axios';
 import chalk from 'chalk';
 import ora from 'ora';
-import dotenv from 'dotenv';
-
-// Load environment variables
-dotenv.config();
+import httpClient from './api/http.js';
+import { getApiKey } from './api/auth.js';
+import { WeatherError, ERROR_CODES } from './utils/errors.js';
+import { validateLocation, validateCoordinates } from './utils/validators.js';
 
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
-const API_KEY = process.env.WEATHER_API_KEY;
 
 // Regional temperature units mapping
 const FAHRENHEIT_COUNTRIES = new Set([
@@ -61,21 +59,18 @@ function determineDisplayUnits(countryCode, userPreference = null) {
 
 // Get weather by coordinates
 async function getWeatherByCoords(lat, lon, userUnits = null) {
-  if (!API_KEY) {
-    console.error(chalk.red('❌ No API key found. Please set WEATHER_API_KEY in your .env file'));
-    console.log(chalk.yellow('Get your free API key at: https://openweathermap.org/api'));
-    process.exit(1);
-  }
+  const { latitude, longitude } = validateCoordinates(lat, lon);
+  const apiKey = await getApiKey();
 
   const spinner = ora('Fetching weather data...').start();
   
   try {
     // Get current weather (metric first to determine country)
-    const weatherResponse = await axios.get(`${BASE_URL}/weather`, {
+    const weatherResponse = await httpClient.get(`${BASE_URL}/weather`, {
       params: {
-        lat,
-        lon,
-        appid: API_KEY,
+        lat: latitude,
+        lon: longitude,
+        appid: apiKey,
         units: 'metric'
       }
     });
@@ -86,11 +81,11 @@ async function getWeatherByCoords(lat, lon, userUnits = null) {
     // Get final weather data in correct units
     let finalWeatherData = weatherResponse.data;
     if (unitSystem.api !== 'metric') {
-      const weatherResponseFinal = await axios.get(`${BASE_URL}/weather`, {
+      const weatherResponseFinal = await httpClient.get(`${BASE_URL}/weather`, {
         params: {
-          lat,
-          lon,
-          appid: API_KEY,
+          lat: latitude,
+          lon: longitude,
+          appid: apiKey,
           units: unitSystem.api
         }
       });
@@ -98,21 +93,21 @@ async function getWeatherByCoords(lat, lon, userUnits = null) {
     }
 
     // Get 5-day forecast
-    const forecastResponse = await axios.get(`${BASE_URL}/forecast`, {
+    const forecastResponse = await httpClient.get(`${BASE_URL}/forecast`, {
       params: {
-        lat,
-        lon,
-        appid: API_KEY,
+        lat: latitude,
+        lon: longitude,
+        appid: apiKey,
         units: unitSystem.api
       }
     });
 
     // Get air pollution data for alerts
-    const pollutionResponse = await axios.get(`${BASE_URL}/air_pollution`, {
+    const pollutionResponse = await httpClient.get(`${BASE_URL}/air_pollution`, {
       params: {
-        lat,
-        lon,
-        appid: API_KEY
+        lat: latitude,
+        lon: longitude,
+        appid: apiKey
       }
     });
 
@@ -126,34 +121,37 @@ async function getWeatherByCoords(lat, lon, userUnits = null) {
     };
   } catch (error) {
     spinner.fail('Failed to fetch weather data');
-    console.error(chalk.red('❌ Error:', error.message));
-    process.exit(1);
+    
+    if (error.response?.status === 404) {
+      throw new WeatherError('Location not found', ERROR_CODES.LOCATION_NOT_FOUND, 404);
+    } else if (error.response?.status === 401) {
+      throw new WeatherError('Invalid API key', ERROR_CODES.API_KEY_INVALID, 401);
+    } else if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+      throw new WeatherError('Request timed out. Please try again.', ERROR_CODES.NETWORK_ERROR);
+    } else if (error.response?.status === 429) {
+      throw new WeatherError(error.message, ERROR_CODES.RATE_LIMIT, 429);
+    }
+    
+    throw new WeatherError(
+      `Network error: ${error.message}`,
+      ERROR_CODES.NETWORK_ERROR
+    );
   }
 }
 
 // Fetch weather data by location
 async function getWeather(location, userUnits = null) {
-  if (!API_KEY) {
-    console.error(chalk.red('❌ No API key found. Please set WEATHER_API_KEY in your .env file'));
-    console.log(chalk.yellow('Get your free API key at: https://openweathermap.org/api'));
-    process.exit(1);
-  }
-
-  // Validate location format (require city, state/country)
-  if (!location || !location.includes(',')) {
-    console.error(chalk.red('❌ Invalid location format. Please use: "City, State" or "City, Country"'));
-    console.log(chalk.yellow('Examples: "San Ramon, CA" or "London, UK" or "Tokyo, JP"'));
-    process.exit(1);
-  }
+  const validatedLocation = validateLocation(location);
+  const apiKey = await getApiKey();
 
   const spinner = ora('Fetching weather data...').start();
   
   try {
     // First, get location info to determine regional preferences
-    const weatherResponse = await axios.get(`${BASE_URL}/weather`, {
+    const weatherResponse = await httpClient.get(`${BASE_URL}/weather`, {
       params: {
-        q: location,
-        appid: API_KEY,
+        q: validatedLocation,
+        appid: apiKey,
         units: 'metric' // Always fetch in metric first to get country code
       }
     });
@@ -166,10 +164,10 @@ async function getWeather(location, userUnits = null) {
     let forecastData, pollutionData;
     
     if (unitSystem.api !== 'metric') {
-      const weatherResponseFinal = await axios.get(`${BASE_URL}/weather`, {
+      const weatherResponseFinal = await httpClient.get(`${BASE_URL}/weather`, {
         params: {
-          q: location,
-          appid: API_KEY,
+          q: validatedLocation,
+          appid: apiKey,
           units: unitSystem.api
         }
       });
@@ -177,20 +175,20 @@ async function getWeather(location, userUnits = null) {
     }
 
     // Get 5-day forecast
-    const forecastResponse = await axios.get(`${BASE_URL}/forecast`, {
+    const forecastResponse = await httpClient.get(`${BASE_URL}/forecast`, {
       params: {
-        q: location,
-        appid: API_KEY,
+        q: validatedLocation,
+        appid: apiKey,
         units: unitSystem.api
       }
     });
 
     // Get air pollution data for alerts
-    const pollutionResponse = await axios.get(`${BASE_URL}/air_pollution`, {
+    const pollutionResponse = await httpClient.get(`${BASE_URL}/air_pollution`, {
       params: {
         lat: finalWeatherData.coord.lat,
         lon: finalWeatherData.coord.lon,
-        appid: API_KEY
+        appid: apiKey
       }
     });
 
@@ -207,15 +205,22 @@ async function getWeather(location, userUnits = null) {
     return data;
   } catch (error) {
     spinner.fail('Failed to fetch weather data');
+    
     if (error.response?.status === 404) {
-      console.error(chalk.red(`❌ Location "${location}" not found`));
-      console.log(chalk.yellow('Please check the spelling and use format: "City, State" or "City, Country"'));
+      throw new WeatherError(
+        `Location "${location}" not found. Please check the spelling.`,
+        ERROR_CODES.LOCATION_NOT_FOUND,
+        404
+      );
     } else if (error.response?.status === 401) {
-      console.error(chalk.red('❌ Invalid API key'));
-    } else {
-      console.error(chalk.red('❌ Error:', error.message));
+      throw new WeatherError('Invalid API key', ERROR_CODES.API_KEY_INVALID, 401);
+    } else if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+      throw new WeatherError('Request timed out. Please try again.', ERROR_CODES.NETWORK_ERROR);
+    } else if (error.response?.status === 429) {
+      throw new WeatherError(error.message, ERROR_CODES.RATE_LIMIT, 429);
     }
-    process.exit(1);
+    
+    throw error;
   }
 }
 

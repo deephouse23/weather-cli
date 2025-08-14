@@ -1,6 +1,6 @@
 {
   "name": "weather-cli",
-  "version": "0.0.24",
+  "version": "0.3.0",
   "description": "A beautiful CLI weather application with horizontal layout and enhanced features",
   "main": "index.js",
   "type": "module",
@@ -39,6 +39,8 @@
     "dotenv": "^16.6.1",
     "ora": "^8.2.0",
     "boxen": "^7.1.1",
-    "inquirer": "^12.9.0"
+    "inquirer": "^12.9.0",
+    "keytar": "^7.9.0",
+    "axios-retry": "^4.0.0"
   }
 }

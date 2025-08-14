@@ -1,12 +1,18 @@
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { WeatherError, ERROR_CODES } from './utils/errors.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const CACHE_FILE = join(__dirname, '..', '.weather-cache.json');
 const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes
+const MAX_CACHE_SIZE = 100; // Maximum number of entries
+const MAX_CACHE_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+// Simple LRU tracking
+const accessOrder = [];
 
 // Load cache from file
 async function loadCache() {
@@ -20,7 +26,43 @@ async function loadCache() {
 
 // Save cache to file
 async function saveCache(cache) {
-  await fs.writeFile(CACHE_FILE, JSON.stringify(cache, null, 2));
+  try {
+    await fs.writeFile(CACHE_FILE, JSON.stringify(cache, null, 2));
+  } catch (error) {
+    throw new WeatherError('Failed to save cache', ERROR_CODES.CACHE_ERROR);
+  }
+}
+
+// Evict oldest entries if cache is too large
+async function evictOldEntries(cache) {
+  const entries = Object.entries(cache);
+  const now = Date.now();
+  
+  // Remove very old entries first
+  let updatedCache = {};
+  let count = 0;
+  
+  for (const [key, value] of entries) {
+    if ((now - value.timestamp) < MAX_CACHE_AGE && count < MAX_CACHE_SIZE) {
+      updatedCache[key] = value;
+      count++;
+    }
+  }
+  
+  // If still too large, remove least recently used
+  if (count >= MAX_CACHE_SIZE) {
+    const sortedEntries = Object.entries(updatedCache)
+      .sort((a, b) => {
+        const aIndex = accessOrder.indexOf(a[0]);
+        const bIndex = accessOrder.indexOf(b[0]);
+        return (aIndex === -1 ? Infinity : aIndex) - (bIndex === -1 ? Infinity : bIndex);
+      })
+      .slice(0, MAX_CACHE_SIZE - 1);
+    
+    updatedCache = Object.fromEntries(sortedEntries);
+  }
+  
+  return updatedCache;
 }
 
 // Get cached weather data if not expired
@@ -30,6 +72,13 @@ async function getCachedWeather(location, units) {
   const cached = cache[key];
   
   if (cached && (Date.now() - cached.timestamp) < CACHE_EXPIRY) {
+    // Update access order for LRU
+    const index = accessOrder.indexOf(key);
+    if (index > -1) {
+      accessOrder.splice(index, 1);
+    }
+    accessOrder.push(key);
+    
     return cached.data;
   }
   
@@ -44,7 +93,17 @@ async function setCachedWeather(location, units, data) {
     data,
     timestamp: Date.now()
   };
-  await saveCache(cache);
+  
+  // Update access order
+  const index = accessOrder.indexOf(key);
+  if (index > -1) {
+    accessOrder.splice(index, 1);
+  }
+  accessOrder.push(key);
+  
+  // Evict old entries if needed
+  const updatedCache = await evictOldEntries(cache);
+  await saveCache(updatedCache);
 }
 
 // Clean expired cache entries

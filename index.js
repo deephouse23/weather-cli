@@ -4,15 +4,27 @@ import { program } from 'commander';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import dotenv from 'dotenv';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
 // Import our modules
 import { getWeather, getWeatherByCoords } from './src/weather.js';
 import { getCachedWeather, setCachedWeather, cleanExpiredCache, getCacheStats, clearCache } from './src/cache.js';
 import { displayCurrentWeather, display5DayForecast, display24HourForecast } from './src/display.js';
 import { processTemperatureOptions, getDefaultLocation, getDefaultUnits, setDefaultLocation, setDefaultUnits } from './src/config.js';
+import { WeatherError, mapErrorToExitCode } from './src/utils/errors.js';
+import { getApiKey, setApiKey, testApiKey } from './src/api/auth.js';
+import { sanitizeLocation } from './src/utils/validators.js';
 
 // Load environment variables
 dotenv.config();
+
+// Get package version
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(join(__dirname, 'package.json'), 'utf8'));
+const VERSION = packageJson.version;
 
 // Beta banner function
 function showBetaBanner() {
@@ -22,7 +34,7 @@ function showBetaBanner() {
 ╔══════════════════════════════════════╗
 ║              BETA SOFTWARE           ║
 ║                                      ║
-║    Weather CLI v0.0.22               ║
+║    Weather CLI v${VERSION.padEnd(20)}║
 ║    Under active development          ║
 ║                                      ║
 ║    Feedback & bugs welcome at:       ║
@@ -35,17 +47,16 @@ function showBetaBanner() {
 async function compareWeather(city1, city2, userUnits = null) {
   console.log(chalk.cyan.bold(`\n🌍 Comparing weather: ${city1} vs ${city2}`));
   
-  try {
-    const [data1, data2] = await Promise.all([
-      getWeather(city1, userUnits),
-      getWeather(city2, userUnits)
-    ]);
-    
-    console.log(chalk.green('\n📍 City 1:'));
-    displayCurrentWeather(data1, data1.displayUnit);
-    
-    console.log(chalk.green('\n📍 City 2:'));
-    displayCurrentWeather(data2, data2.displayUnit);
+  const [data1, data2] = await Promise.all([
+    getWeather(city1, userUnits),
+    getWeather(city2, userUnits)
+  ]);
+  
+  console.log(chalk.green('\n📍 City 1:'));
+  displayCurrentWeather(data1, data1.displayUnit);
+  
+  console.log(chalk.green('\n📍 City 2:'));
+  displayCurrentWeather(data2, data2.displayUnit);
     
     // Compare temperatures
     const temp1 = data1.current.main.temp;
@@ -61,11 +72,6 @@ async function compareWeather(city1, city2, userUnits = null) {
     } else {
       console.log(chalk.green('Both cities have the same temperature!'));
     }
-    
-  } catch (error) {
-    console.error(chalk.red(`❌ Error comparing weather: ${error.message}`));
-    process.exit(1);
-  }
 }
 
 // Interactive mode
@@ -104,46 +110,59 @@ async function interactiveMode() {
     }
   ]);
   
-  try {
-    const data = await getWeather(answers.location, answers.units);
-    
-    displayCurrentWeather(data, data.displayUnit);
-    
-    if (answers.forecast === '24h' || answers.forecast === 'all') {
-      display24HourForecast(data, data.displayUnit);
-    }
-    
-    if (answers.forecast === '5day' || answers.forecast === 'all') {
-      display5DayForecast(data, data.displayUnit);
-    }
-    
-    // Save as default if user wants
-    const saveDefault = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'save',
-        message: 'Save as default location?',
-        default: false
-      }
-    ]);
-    
-    if (saveDefault.save) {
-      await setDefaultLocation(answers.location);
-      await setDefaultUnits(answers.units);
-      console.log(chalk.green('✅ Default settings saved!'));
-    }
-    
-  } catch (error) {
-    console.error(chalk.red(`❌ Error: ${error.message}`));
-    process.exit(1);
+  const data = await getWeather(answers.location, answers.units);
+  
+  displayCurrentWeather(data, data.displayUnit);
+  
+  if (answers.forecast === '24h' || answers.forecast === 'all') {
+    display24HourForecast(data, data.displayUnit);
   }
+  
+  if (answers.forecast === '5day' || answers.forecast === 'all') {
+    display5DayForecast(data, data.displayUnit);
+  }
+  
+  // Save as default if user wants
+  const saveDefault = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'save',
+      message: 'Save as default location?',
+      default: false
+    }
+  ]);
+  
+  if (saveDefault.save) {
+    await setDefaultLocation(answers.location);
+    await setDefaultUnits(answers.units);
+    console.log(chalk.green('✅ Default settings saved!'));
+  }
+}
+
+// Error handler wrapper
+function handleError(error) {
+  if (error instanceof WeatherError) {
+    console.error(chalk.red(`❌ ${error.message}`));
+    
+    // Add helpful hints for specific errors
+    if (error.code === 'API_KEY_MISSING') {
+      console.log(chalk.yellow('Get your free API key at: https://openweathermap.org/api'));
+      console.log(chalk.yellow('Then run: weather auth set'));
+    } else if (error.code === 'LOCATION_NOT_FOUND') {
+      console.log(chalk.yellow('Examples: "San Ramon, CA" or "London, UK"'));
+    }
+  } else {
+    console.error(chalk.red(`❌ Unexpected error: ${error.message}`));
+  }
+  
+  process.exit(mapErrorToExitCode(error));
 }
 
 // Set up CLI commands
 program
   .name('weather')
   .description('A beautiful CLI weather application')
-  .version('0.0.22');
+  .version(VERSION);
 
 program
   .command('now [location]')
@@ -158,7 +177,7 @@ program
         console.error(chalk.red('❌ No location provided and no default set'));
         console.log(chalk.yellow('Usage: weather "City, State" or weather "City, Country"'));
         console.log(chalk.yellow('Examples: weather "San Ramon, CA" or weather "London, UK"'));
-        process.exit(1);
+        throw new WeatherError('No location provided', 'INVALID_INPUT');
       }
       location = defaultLocation;
     }
@@ -190,7 +209,7 @@ program
       const defaultLocation = await getDefaultLocation();
       if (!defaultLocation) {
         console.error(chalk.red('❌ No location provided and no default set'));
-        process.exit(1);
+        throw new WeatherError('No location provided', 'INVALID_INPUT');
       }
       location = defaultLocation;
     }
@@ -212,7 +231,7 @@ program
       const defaultLocation = await getDefaultLocation();
       if (!defaultLocation) {
         console.error(chalk.red('❌ No location provided and no default set'));
-        process.exit(1);
+        throw new WeatherError('No location provided', 'INVALID_INPUT');
       }
       location = defaultLocation;
     }
@@ -241,11 +260,7 @@ program
   .option('--celsius', 'Force Celsius temperature display')
   .option('--fahrenheit', 'Force Fahrenheit temperature display')
   .action(async (coordinates, options) => {
-    const [lat, lon] = coordinates.split(',').map(coord => parseFloat(coord.trim()));
-    if (isNaN(lat) || isNaN(lon)) {
-      console.error(chalk.red('❌ Invalid coordinates format. Use: lat,lon (e.g., 40.7128,-74.0060)'));
-      process.exit(1);
-    }
+    const [lat, lon] = coordinates.split(',').map(coord => coord.trim());
     const userUnits = processTemperatureOptions(options);
     const data = await getWeatherByCoords(lat, lon, userUnits);
     displayCurrentWeather(data, data.displayUnit);
@@ -280,6 +295,48 @@ program
     console.log(chalk.green('✅ Configuration saved!'));
   });
 
+const authCommand = program
+  .command('auth')
+  .description('Manage API authentication');
+
+authCommand
+  .command('set')
+  .description('Set API key securely')
+  .action(async () => {
+    const answers = await inquirer.prompt([
+      {
+        type: 'password',
+        name: 'apiKey',
+        message: 'Enter your OpenWeatherMap API key:',
+        mask: '*',
+        validate: (input) => input.length > 0 || 'API key cannot be empty'
+      }
+    ]);
+    
+    // Test the key
+    console.log(chalk.blue('Testing API key...'));
+    try {
+      await testApiKey(answers.apiKey);
+      const saved = await setApiKey(answers.apiKey);
+      
+      if (saved) {
+        console.log(chalk.green('✅ API key saved to system keychain'));
+      } else {
+        console.log(chalk.yellow('⚠️  Could not save to keychain, please set WEATHER_API_KEY environment variable'));
+      }
+    } catch (error) {
+      throw new WeatherError('Invalid API key', 'API_KEY_INVALID');
+    }
+  });
+
+authCommand
+  .command('test')
+  .description('Test API key validity')
+  .action(async () => {
+    await testApiKey();
+    console.log(chalk.green('✅ API key is valid'));
+  });
+
 program
   .command('cache')
   .description('Manage weather cache')
@@ -309,59 +366,57 @@ program
   .description('Interactive mode with prompts')
   .action(interactiveMode);
 
-// Handle default case - if arguments exist but don't match commands, treat as location
-const args = process.argv.slice(2);
-const knownCommands = ['now', 'forecast', '5day', 'compare', 'coords', 'config', 'cache', 'interactive', 'i', 'help', '--help', '-h', '--version', '-V'];
-const knownOptions = ['--no-beta-banner', '-u', '--units', '-f', '--forecast', '-a', '--alerts', '--celsius', '--fahrenheit'];
-
-if (args.length === 0) {
-  // No arguments, start interactive mode
-  showBetaBanner();
-  interactiveMode();
-} else if (args.length > 0 && (!knownCommands.includes(args[0]) || args.includes('--no-beta-banner')) && args.filter(arg => !knownOptions.includes(arg) && !arg.match(/^(metric|imperial|celsius|fahrenheit|auto)$/)).length > 0) {
-  // First argument is not a known command and doesn't start with -, treat as location for current weather
-  if (!args.includes('--no-beta-banner')) {
-    showBetaBanner();
-  }
-  const location = args.join(' ');
-  
-  // Process temperature options
-  const options = {
-    celsius: args.includes('--celsius'),
-    fahrenheit: args.includes('--fahrenheit'),
-    units: args.includes('-u') || args.includes('--units') ? 
-      (args[args.indexOf(args.includes('-u') ? '-u' : '--units') + 1] || 'auto') : 'auto'
-  };
-  const userUnits = processTemperatureOptions(options);
-  
-  const showForecast = args.includes('-f') || args.includes('--forecast');
-  const showAlerts = args.includes('-a') || args.includes('--alerts');
-  
+// Main execution
+async function main() {
   try {
-    const cleanLocation = location.replace(/(-u|--units|metric|imperial|celsius|fahrenheit|auto|-f|--forecast|-a|--alerts|--celsius|--fahrenheit|--no-beta-banner)/g, '').trim();
-    
-    // Validate location format
-    if (!cleanLocation.includes(',')) {
-      console.error(chalk.red('❌ Invalid location format. Please use: "City, State" or "City, Country"'));
-      console.log(chalk.yellow('Examples: weather "San Ramon, CA" or weather "London, UK"'));
-      process.exit(1);
-    }
-    
-    const data = await getWeather(cleanLocation, userUnits);
-    displayCurrentWeather(data, data.displayUnit);
-    
-    if (showAlerts) {
-      // Alerts are already shown in displayCurrentWeather
-    }
-    
-    if (showForecast) {
-      display24HourForecast(data, data.displayUnit);
+    // Handle default case - if arguments exist but don't match commands, treat as location
+    const args = process.argv.slice(2);
+    const knownCommands = ['now', 'forecast', '5day', 'compare', 'coords', 'config', 'auth', 'cache', 'interactive', 'i', 'help', '--help', '-h', '--version', '-V'];
+    const knownOptions = ['--no-beta-banner', '-u', '--units', '-f', '--forecast', '-a', '--alerts', '--celsius', '--fahrenheit'];
+
+    if (args.length === 0) {
+      // No arguments, start interactive mode
+      showBetaBanner();
+      await interactiveMode();
+    } else if (args.length > 0 && (!knownCommands.includes(args[0]) || args.includes('--no-beta-banner')) && args.filter(arg => !knownOptions.includes(arg) && !arg.match(/^(metric|imperial|celsius|fahrenheit|auto)$/)).length > 0) {
+      // First argument is not a known command and doesn't start with -, treat as location for current weather
+      if (!args.includes('--no-beta-banner')) {
+        showBetaBanner();
+      }
+      const location = args.join(' ');
+      
+      // Process temperature options
+      const options = {
+        celsius: args.includes('--celsius'),
+        fahrenheit: args.includes('--fahrenheit'),
+        units: args.includes('-u') || args.includes('--units') ? 
+          (args[args.indexOf(args.includes('-u') ? '-u' : '--units') + 1] || 'auto') : 'auto'
+      };
+      const userUnits = processTemperatureOptions(options);
+      
+      const showForecast = args.includes('-f') || args.includes('--forecast');
+      const showAlerts = args.includes('-a') || args.includes('--alerts');
+      
+      const cleanLocation = location.replace(/(-u|--units|metric|imperial|celsius|fahrenheit|auto|-f|--forecast|-a|--alerts|--celsius|--fahrenheit|--no-beta-banner)/g, '').trim();
+      
+      const data = await getWeather(cleanLocation, userUnits);
+      displayCurrentWeather(data, data.displayUnit);
+      
+      if (showAlerts) {
+        // Alerts are already shown in displayCurrentWeather
+      }
+      
+      if (showForecast) {
+        display24HourForecast(data, data.displayUnit);
+      }
+    } else {
+      // Parse as normal commander commands
+      await program.parseAsync();
     }
   } catch (error) {
-    console.error(chalk.red(`❌ ${error.message}`));
-    process.exit(1);
+    handleError(error);
   }
-} else {
-  // Parse as normal commander commands
-  program.parse();
 }
+
+// Run main function
+main();

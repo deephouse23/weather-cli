@@ -1,7 +1,7 @@
-# Weather CLI v0.0.24 🌤️
+# Weather CLI v0.3.0 🌤️
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.0.24-orange)
+![Version](https://img.shields.io/badge/version-0.3.0-orange)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
@@ -179,10 +179,19 @@ node index.js "New York, US"
 
 ## 🔧 **Configuration**
 
-### **Environment Variables**
+### **API Key Setup**
+
+Set your OpenWeatherMap API key (get one free at [OpenWeatherMap](https://openweathermap.org/api)):
+
 ```bash
-# .env file
-WEATHER_API_KEY=your_openweathermap_api_key_here
+# Secure method (recommended) - stores in OS keychain
+weather auth set
+
+# Test your API key
+weather auth test
+
+# Alternative method - environment variable
+export WEATHER_API_KEY=your_api_key_here
 ```
 
 ### **Cache Management**
