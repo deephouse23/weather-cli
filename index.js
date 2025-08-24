@@ -608,6 +608,291 @@ async function interactiveMode() {
 program
   .name('weather')
   .description('A beautiful CLI weather application')
+  .version('0.3.1')
+  .option('--no-beta-banner', 'Hide the beta software banner');
+
+program
+  .command('now [location]')
+  .description('Get current weather for a location')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .option('-f, --forecast', 'Include 24-hour forecast')
+  .option('-a, --alerts', 'Show weather alerts')
+  .action(async (location, options) => {
+    if (!location) {
+      const config = await loadConfig();
+      location = config.defaultLocation;
+      if (!location) {
+        console.error(chalk.red('❌ Please provide a location or set a default'));
+        process.exit(1);
+      }
+    }
+    
+    const data = await getWeather(location, options.units);
+    displayCurrentWeather(data.current, options.units);
+    
+    if (options.alerts) {
+      displayAlerts(data);
+    }
+    
+    if (options.forecast) {
+      display24HourForecast(data.forecast, options.units);
+    }
+  });
+
+program
+  .command('forecast [location]')
+  .description('Get 24-hour forecast for a location')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .action(async (location, options) => {
+    if (!location) {
+      const config = await loadConfig();
+      location = config.defaultLocation;
+      if (!location) {
+        console.error(chalk.red('❌ Please provide a location or set a default'));
+        process.exit(1);
+      }
+    }
+    
+    const data = await getWeather(location, options.units);
+    displayCurrentWeather(data.current, options.units);
+    display24HourForecast(data.forecast, options.units);
+    displayAlerts(data);
+  });
+
+program
+  .command('5day [location]')
+  .description('Get 5-day forecast for a location')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .action(async (location, options) => {
+    if (!location) {
+      const config = await loadConfig();
+      location = config.defaultLocation;
+      if (!location) {
+        console.error(chalk.red('❌ Please provide a location or set a default'));
+        process.exit(1);
+      }
+    }
+    
+    const data = await getWeather(location, options.units);
+    displayCurrentWeather(data.current, options.units);
+    display5DayForecast(data.forecast, options.units);
+    displayAlerts(data);
+  });
+
+program
+  .command('compare <city1> <city2>')
+  .description('Compare weather between two cities')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .action(async (city1, city2, options) => {
+    await compareWeather(city1, city2, options.units);
+  });
+
+program
+  .command('coords <coordinates>')
+  .description('Get weather by GPS coordinates (format: lat,lon)')
+  .option('-u, --units <type>', 'Temperature units (metric/imperial)', 'metric')
+  .action(async (coordinates, options) => {
+    const [lat, lon] = coordinates.split(',').map(coord => parseFloat(coord.trim()));
+    if (isNaN(lat) || isNaN(lon)) {
+      console.error(chalk.red('❌ Invalid coordinates format. Use: lat,lon (e.g., 40.7128,-74.0060)'));
+      process.exit(1);
+    }
+    const data = await getWeatherByCoords(lat, lon, options.units);
+    displayCurrentWeather(data.current, options.units);
+    displayAlerts(data);
+  });
+
+program
+  .command('config')
+  .description('Configure default settings')
+  .action(async () => {
+    const answers = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'defaultLocation',
+        message: 'Default location:'
+      },
+      {
+        type: 'list',
+        name: 'defaultUnits',
+        message: 'Default temperature units:',
+        choices: [
+          { name: 'Celsius (°C)', value: 'metric' },
+          { name: 'Fahrenheit (°F)', value: 'imperial' }
+        ]
+      }
+    ]);
+    
+    await saveConfig(answers);
+    console.log(chalk.green('✅ Configuration saved!'));
+  });
+
+program
+  .command('cache')
+  .description('Manage weather cache')
+  .option('-c, --clear', 'Clear all cached data')
+  .action(async (options) => {
+    if (options.clear) {
+      await fs.writeFile(CACHE_FILE, '{}');
+      console.log(chalk.green('✅ Cache cleared!'));
+    } else {
+      const cache = await loadCache();
+      const count = Object.keys(cache).length;
+      console.log(chalk.blue(`📦 Cache contains ${count} entries`));
+    }
+  });
+
+program
+  .command('interactive')
+  .alias('i')
+  .description('Interactive mode with prompts')
+  .action(interactiveMode);
+
+// Handle default case - if arguments exist but don't match commands, treat as location
+const args = process.argv.slice(2);
+const knownCommands = ['now', 'forecast', '5day', 'compare', 'coords', 'config', 'cache', 'interactive', 'i', 'help', '--help', '-h', '--version', '-V'];
+const knownOptions = ['--no-beta-banner', '-u', '--units', '-f', '--forecast', '-a', '--alerts'];
+
+if (args.length === 0) {
+  // No arguments, start interactive mode
+  showBetaBanner();
+  interactiveMode();
+} else if (args.length > 0 && (!knownCommands.includes(args[0]) || args.includes('--no-beta-banner')) && args.filter(arg => !knownOptions.includes(arg) && !arg.match(/^(metric|imperial)$/)).length > 0) {
+  // First argument is not a known command and doesn't start with -, treat as location for current weather
+  if (!args.includes('--no-beta-banner')) {
+    showBetaBanner();
+  }
+  const location = args.join(' ');
+  const units = args.includes('-u') || args.includes('--units') ? 
+    (args[args.indexOf(args.includes('-u') ? '-u' : '--units') + 1] || 'metric') : 'metric';
+  const showForecast = args.includes('-f') || args.includes('--forecast');
+  const showAlerts = args.includes('-a') || args.includes('--alerts');
+  
+  try {
+    const cleanLocation = location.replace(/(-u|--units|metric|imperial|-f|--forecast|-a|--alerts|--no-beta-banner)/g, '').trim();
+    const data = await getWeather(cleanLocation, units);
+    displayCurrentWeather(data.current, units);
+    
+    if (showAlerts) {
+      displayAlerts(data);
+    }
+    
+    if (showForecast) {
+      display24HourForecast(data.forecast, units);
+    }
+  } catch (error) {
+    console.error(chalk.red(`❌ ${error.message}`));
+    process.exit(1);
+  }
+} else {
+  // Parse as normal commander commands
+  program.parse();
+}
+      ]
+    }
+  ]);
+
+  if (answers.mode === 'compare') {
+    const compareAnswers = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'city1',
+        message: 'Enter first city:',
+        default: config.defaultLocation || 'London'
+      },
+      {
+        type: 'input',
+        name: 'city2',
+        message: 'Enter second city:',
+        default: 'Tokyo'
+      },
+      {
+        type: 'list',
+        name: 'units',
+        message: 'Choose temperature units:',
+        choices: [
+          { name: 'Celsius (°C)', value: 'metric' },
+          { name: 'Fahrenheit (°F)', value: 'imperial' }
+        ],
+        default: config.defaultUnits || 'metric'
+      }
+    ]);
+    
+    await compareWeather(compareAnswers.city1, compareAnswers.city2, compareAnswers.units);
+    return;
+  }
+
+  if (answers.mode === 'coords') {
+    const coordsAnswers = await inquirer.prompt([
+      {
+        type: 'number',
+        name: 'lat',
+        message: 'Enter latitude:',
+        default: 51.5074
+      },
+      {
+        type: 'number',
+        name: 'lon',
+        message: 'Enter longitude:',
+        default: -0.1278
+      },
+      {
+        type: 'list',
+        name: 'units',
+        message: 'Choose temperature units:',
+        choices: [
+          { name: 'Celsius (°C)', value: 'metric' },
+          { name: 'Fahrenheit (°F)', value: 'imperial' }
+        ],
+        default: config.defaultUnits || 'metric'
+      }
+    ]);
+    
+    const data = await getWeatherByCoords(coordsAnswers.lat, coordsAnswers.lon, coordsAnswers.units);
+    displayCurrentWeather(data.current, coordsAnswers.units);
+    displayAlerts(data);
+    return;
+  }
+
+  const locationAnswers = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'location',
+      message: 'Enter location (city name or zip code):',
+      default: config.defaultLocation || 'London'
+    },
+    {
+      type: 'list',
+      name: 'units',
+      message: 'Choose temperature units:',
+      choices: [
+        { name: 'Celsius (°C)', value: 'metric' },
+        { name: 'Fahrenheit (°F)', value: 'imperial' }
+      ],
+      default: config.defaultUnits || 'metric'
+    }
+  ]);
+
+  const data = await getWeather(locationAnswers.location, locationAnswers.units);
+  
+  if (answers.mode === 'current') {
+    displayCurrentWeather(data.current, locationAnswers.units);
+    displayAlerts(data);
+  } else if (answers.mode === '24h') {
+    displayCurrentWeather(data.current, locationAnswers.units);
+    display24HourForecast(data.forecast, locationAnswers.units);
+    displayAlerts(data);
+  } else if (answers.mode === '5day') {
+    displayCurrentWeather(data.current, locationAnswers.units);
+    display5DayForecast(data.forecast, locationAnswers.units);
+    displayAlerts(data);
+  }
+}
+
+// CLI Setup
+program
+  .name('weather')
+  .description('A beautiful CLI weather application')
   .version('0.0.23-beta')
   .option('--no-beta-banner', 'Hide the beta software banner');
 
