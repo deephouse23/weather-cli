@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.1] - 2025-08-25
 
 ### 📦 **NPM Package Release**
-- **Global Installation**: Now available as `@16bitweather/weather-cli` on npm
+- **Global Installation**: Now available as `weather-cli-16bit` on npm
 - **Unique Package Name**: Uses scoped name to avoid npm conflicts
 - **Proper Bin Structure**: Added `bin/weather.js` executable with cross-platform compatibility
 - **NPM Ready**: Complete package configuration with proper files, engines, and metadata

@@ -1,4 +1,4 @@
-# @16bitweather/weather-cli v0.3.1 🌤️
+# weather-cli-16bit v0.3.1 🌤️
 
 ![npm version](https://img.shields.io/badge/npm-v0.3.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -16,10 +16,10 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 ## 🆕 **What's New in v0.3.1** - NPM Package Ready!
 
 ### 📦 **Easy Global Installation**
-- **NPM Package**: Now available as `@16bitweather/weather-cli` on npm
-- **One Command Setup**: Install globally with `npm install -g @16bitweather/weather-cli`
+- **NPM Package**: Now available as `weather-cli-16bit` on npm
+- **One Command Setup**: Install globally with `npm install -g weather-cli-16bit`
 - **Instant Access**: Use `weather` command from anywhere on your system
-- **Auto-Updates**: Easy updates with `npm update -g @16bitweather/weather-cli`
+- **Auto-Updates**: Easy updates with `npm update -g weather-cli-16bit`
 
 ### 🔍 **Enhanced Location Search** (from v0.4.0)
 
@@ -60,7 +60,7 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 ### **Method 1: NPM Global Installation (Recommended)**
 ```bash
 # Install globally from npm
-npm install -g @16bitweather/weather-cli
+npm install -g weather-cli-16bit
 
 # Start using immediately
 weather "San Francisco, CA"
@@ -237,7 +237,7 @@ src/
 ## 📊 **Package Information**
 
 ### **NPM Package Details**
-- **Package Name**: `@16bitweather/weather-cli`
+- **Package Name**: `weather-cli-16bit`
 - **Global Command**: `weather`
 - **Minimum Node Version**: v14.0.0
 - **Supported Platforms**: macOS, Windows, Linux
@@ -245,13 +245,13 @@ src/
 ### **Update Instructions**
 ```bash
 # Check current version
-npm list -g @16bitweather/weather-cli
+npm list -g weather-cli-16bit
 
 # Update to latest version
-npm update -g @16bitweather/weather-cli
+npm update -g weather-cli-16bit
 
 # Uninstall if needed
-npm uninstall -g @16bitweather/weather-cli
+npm uninstall -g weather-cli-16bit
 ```
 
 ## 🔧 **Configuration**

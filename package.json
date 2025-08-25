@@ -1,5 +1,5 @@
 {
-  "name": "@16bitweather/weather-cli",
+  "name": "weather-cli-16bit",
   "version": "0.3.1",
   "description": "A beautiful command-line weather application with smart location search and secure API key management",
   "main": "index.js",
