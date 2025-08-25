@@ -14,15 +14,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 #### Global Installation (Recommended)
 After `npm install -g .`:
 - `weather` - Interactive mode by default
-- `weather <location>` - Get current weather (simplified)
+- `weather <location>` - Get current weather (flexible format)
 - `weather london` - Current weather for London
 - `weather "new york"` - Current weather for New York
+- `weather "san ramon, ca"` - Current weather with state
 - `weather forecast [location]` - Get 24-hour forecast  
 - `weather 5day [location]` - Get 5-day forecast
 - `weather compare <city1> <city2>` - Compare weather between two cities
 - `weather coords <lat,lon>` - Get weather by GPS coordinates
 - `weather config` - Configure default settings
-- `weather cache` - View cache status or clear with `-c` flag
+- `weather cache` - View cache status
+- `weather cache -c` - Clear cache
+- `weather auth set` - Store API key securely
+- `weather auth test` - Test API key validity
 
 #### Local Development
 - `node index.js` - Runs interactive mode by default

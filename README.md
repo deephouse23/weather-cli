@@ -1,7 +1,7 @@
-# Weather CLI v0.3.1 🌤️
+# Weather CLI v0.4.0 🌤️
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.3.1-orange)
+![Version](https://img.shields.io/badge/version-0.4.0-orange)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
@@ -12,7 +12,15 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 
 **✨ Now with simplified global installation! Just type `weather "City, State"` from anywhere on your system.**
 
-## 🆕 **What's New in v0.3.0** - Security & Reliability Release
+## 🆕 **What's New in v0.4.0** - Enhanced Location Search & Auth Commands
+
+### 🔍 **Smart Location Parsing**
+- **Multiple format support**: Automatically tries different location formats when searching
+- **Flexible input**: Works with "City", "City, State", "City, Country", zip codes, and more
+- **Better error messages**: Shows all attempted searches and provides helpful suggestions
+- **Automatic fallback**: Tries variations like "San Ramon, US" and "San Ramon, USA"
+
+## 📚 **v0.3.0 Features** - Security & Reliability Release
 
 ### 🔒 **Enterprise Security**
 - **OS Keychain Integration**: API keys stored securely using `keytar`
@@ -67,17 +75,42 @@ cp .env.example .env
 
 ### **Usage**
 ```bash
-# Basic weather lookup (NEW FORMAT REQUIRED)
-weather "New York, US"
-weather "London, UK"
-weather "Tokyo, JP"
+# Basic weather lookup - flexible formats supported!
+weather "San Ramon"           # City name only
+weather "San Ramon, CA"       # City, State
+weather "New York, US"        # City, Country Code
+weather "London, UK"          # International cities
+weather "94583"               # US Zip codes
+weather "Tokyo"               # Major cities worldwide
+
+# Get forecasts
+weather forecast "London"      # 24-hour forecast
+weather 5day "Tokyo"          # 5-day forecast
+
+# Compare cities
+weather compare "New York" "London"
+
+# GPS coordinates
+weather coords 37.7749,-122.4194
+
+# Interactive mode
+weather                        # No arguments starts interactive mode
+weather interactive           # Explicit interactive mode
+
+# Configuration
+weather config                 # Set default location and units
 
 # Cache management
-weather cache
-weather cache --clean
+weather cache                  # View cache statistics
+weather cache -c              # Clear cache
+
+# Authentication (NEW!)
+weather auth set              # Store API key securely
+weather auth test             # Validate your API key
 
 # Help system
-weather --help
+weather --help                # General help
+weather [command] --help      # Command-specific help
 ```
 
 ## 🎨 **New Horizontal Layout**
@@ -95,6 +128,19 @@ weather --help
 │   💨 Wind: 5.99 mph                                   👁️  Visibility: 10km                                           │
 │                                                                                                                      │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+### **Temperature Units**
+```bash
+# Automatic regional detection
+weather "London"              # Auto-detects UK = Celsius
+weather "New York"            # Auto-detects US = Fahrenheit
+
+# Force specific units
+weather "Tokyo" --celsius     # Force Celsius
+weather "Paris" --fahrenheit  # Force Fahrenheit
+weather "Berlin" -u metric    # Use metric (Celsius)
+weather "Sydney" -u imperial  # Use imperial (Fahrenheit)
 ```
 
 ### **Responsive Design**
@@ -200,6 +246,47 @@ weather auth test
 # Alternative method - environment variable
 export WEATHER_API_KEY=your_api_key_here
 ```
+
+### **Default Settings**
+
+Configure your default location and temperature units:
+
+```bash
+weather config
+
+# This will prompt you to set:
+# - Default location (e.g., "San Francisco, CA")
+# - Default temperature units (Celsius/Fahrenheit)
+```
+
+## 📚 **API Documentation**
+
+### **Command Reference**
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `weather [location]` | Current weather (default if no command) | `weather "Paris"` |
+| `weather now [location]` | Current weather (explicit) | `weather now "Berlin"` |
+| `weather forecast [location]` | 24-hour forecast | `weather forecast "Tokyo"` |
+| `weather 5day [location]` | 5-day forecast | `weather 5day "Sydney"` |
+| `weather compare <city1> <city2>` | Compare two cities | `weather compare "LA" "NYC"` |
+| `weather coords <lat,lon>` | Weather by GPS | `weather coords 51.5,-0.1` |
+| `weather config` | Set defaults | `weather config` |
+| `weather cache` | View cache stats | `weather cache` |
+| `weather cache -c` | Clear cache | `weather cache -c` |
+| `weather auth set` | Store API key | `weather auth set` |
+| `weather auth test` | Test API key | `weather auth test` |
+
+### **Options**
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `-u, --units <type>` | Temperature units (metric/imperial/auto) | `weather "London" -u metric` |
+| `--celsius` | Force Celsius display | `weather "NYC" --celsius` |
+| `--fahrenheit` | Force Fahrenheit display | `weather "London" --fahrenheit` |
+| `-f, --forecast` | Include 24-hour forecast | `weather "Tokyo" -f` |
+| `-a, --alerts` | Show weather alerts | `weather "Miami" -a` |
+| `--no-beta-banner` | Hide beta banner | `weather "Paris" --no-beta-banner` |
 
 ### **Cache Management**
 ```bash
@@ -316,7 +403,16 @@ cp .env.example .env
 
 ## 📝 **Changelog**
 
-### **v0.3.0** (Latest) - Security & Reliability Release
+### **v0.4.0** (Latest) - Enhanced Location Search & Auth Commands
+- 🔍 **SEARCH**: Smart location parsing with multiple format attempts
+- 🔍 **SEARCH**: Automatic fallback for different location formats
+- 🔍 **SEARCH**: Support for city names without state/country
+- 📝 **UX**: Better error messages showing all attempted searches
+- 📝 **UX**: Helpful suggestions for location format issues
+- 🐛 **FIX**: Resolved merge conflicts and duplicate code sections
+- 🐛 **FIX**: Fixed command structure for auth commands
+
+### **v0.3.0** - Security & Reliability Release
 - 🔒 **SECURITY**: OS keychain integration with `keytar` for secure API key storage
 - 🔒 **SECURITY**: Comprehensive input sanitization and validation
 - 🔒 **SECURITY**: New `weather auth set` and `weather auth test` commands

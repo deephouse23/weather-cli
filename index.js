@@ -34,7 +34,7 @@ function showBetaBanner() {
 ╔══════════════════════════════════════╗
 ║              BETA SOFTWARE           ║
 ║                                      ║
-║    Weather CLI v0.3.1                ║
+║    Weather CLI v0.4.0                ║
 ║    Under active development          ║
 ║                                      ║
 ║    Feedback & bugs welcome at:       ║
@@ -162,7 +162,7 @@ function handleError(error) {
 program
   .name('weather')
   .description('A beautiful CLI weather application')
-  .version('0.3.1')
+  .version('0.4.0')
   .option('--no-beta-banner', 'Hide the beta software banner');
 
 program
@@ -341,106 +341,6 @@ if (args.length === 0) {
 } else {
   // Parse as normal commander commands
   program.parse();
-}
-      ]
-    }
-  ]);
-
-  if (answers.mode === 'compare') {
-    const compareAnswers = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'city1',
-        message: 'Enter first city:',
-        default: config.defaultLocation || 'London'
-      },
-      {
-        type: 'input',
-        name: 'city2',
-        message: 'Enter second city:',
-        default: 'Tokyo'
-      },
-      {
-        type: 'list',
-        name: 'units',
-        message: 'Choose temperature units:',
-        choices: [
-          { name: 'Celsius (°C)', value: 'metric' },
-          { name: 'Fahrenheit (°F)', value: 'imperial' }
-        ],
-        default: config.defaultUnits || 'metric'
-      }
-    ]);
-    
-    await compareWeather(compareAnswers.city1, compareAnswers.city2, compareAnswers.units);
-    return;
-  }
-
-  if (answers.mode === 'coords') {
-    const coordsAnswers = await inquirer.prompt([
-      {
-        type: 'number',
-        name: 'lat',
-        message: 'Enter latitude:',
-        default: 51.5074
-      },
-      {
-        type: 'number',
-        name: 'lon',
-        message: 'Enter longitude:',
-        default: -0.1278
-      },
-      {
-        type: 'list',
-        name: 'units',
-        message: 'Choose temperature units:',
-        choices: [
-          { name: 'Celsius (°C)', value: 'metric' },
-          { name: 'Fahrenheit (°F)', value: 'imperial' }
-        ],
-        default: config.defaultUnits || 'metric'
-      }
-    ]);
-    
-    const data = await getWeatherByCoords(coordsAnswers.lat, coordsAnswers.lon, coordsAnswers.units);
-    displayCurrentWeather(data.current, coordsAnswers.units);
-    displayAlerts(data);
-    return;
-  }
-
-  const locationAnswers = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'location',
-      message: 'Enter location (city name or zip code):',
-      default: config.defaultLocation || 'London'
-    },
-    {
-      type: 'list',
-      name: 'units',
-      message: 'Choose temperature units:',
-      choices: [
-        { name: 'Celsius (°C)', value: 'metric' },
-        { name: 'Fahrenheit (°F)', value: 'imperial' }
-      ],
-      default: config.defaultUnits || 'metric'
-    }
-  ]);
-
-  const data = await getWeather(locationAnswers.location, locationAnswers.units);
-  
-  if (answers.mode === 'current') {
-    displayCurrentWeather(data.current, locationAnswers.units);
-    displayAlerts(data);
-  } else if (answers.mode === '24h') {
-    displayCurrentWeather(data.current, locationAnswers.units);
-    display24HourForecast(data.forecast, locationAnswers.units);
-    displayAlerts(data);
-  } else if (answers.mode === '5day') {
-    displayCurrentWeather(data.current, locationAnswers.units);
-    display5DayForecast(data.forecast, locationAnswers.units);
-    displayAlerts(data);
-  }
 }
 
 // CLI Setup
@@ -649,6 +549,48 @@ program
   .alias('i')
   .description('Interactive mode with prompts')
   .action(interactiveMode);
+
+// Auth commands
+program
+  .command('auth <action>')
+  .description('Manage API key authentication (set/test)')
+  .action(async (action) => {
+    if (action === 'set') {
+      const answers = await inquirer.prompt([
+        {
+          type: 'password',
+          name: 'apiKey',
+          message: 'Enter your OpenWeatherMap API key:',
+          validate: input => input.length > 0 || 'API key cannot be empty'
+        }
+      ]);
+      
+      try {
+        await setApiKey(answers.apiKey);
+        console.log(chalk.green('✅ API key stored securely!'));
+      } catch (error) {
+        console.error(chalk.red(`❌ Failed to store API key: ${error.message}`));
+        process.exit(1);
+      }
+    } else if (action === 'test') {
+      try {
+        const isValid = await testApiKey();
+        if (isValid) {
+          console.log(chalk.green('✅ API key is valid and working!'));
+        } else {
+          console.log(chalk.red('❌ API key is invalid or not set'));
+          console.log(chalk.yellow('Run "weather auth set" to configure your API key'));
+        }
+      } catch (error) {
+        console.error(chalk.red(`❌ Error testing API key: ${error.message}`));
+        process.exit(1);
+      }
+    } else {
+      console.error(chalk.red(`❌ Unknown auth action: ${action}`));
+      console.log(chalk.yellow('Use: weather auth set or weather auth test'));
+      process.exit(1);
+    }
+  });
 
 // Main execution
 async function main() {
