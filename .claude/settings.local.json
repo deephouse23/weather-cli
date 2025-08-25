@@ -20,7 +20,8 @@
       "Bash(node:*)",
       "Bash(git tag:*)",
       "Bash(gh release create:*)",
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "Bash(git merge:*)"
     ],
     "deny": []
   }
