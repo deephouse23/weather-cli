@@ -127,7 +127,7 @@ Error messages are now more informative and secure:
 ### **For New Users:**
 ```bash
 # Global installation
-npm install -g weather-cli
+npm install -g weather-cli-16bit
 
 # Setup environment
 cp .env.example .env
@@ -140,7 +140,7 @@ weather "New York, US"
 ### **For Existing Users:**
 ```bash
 # Update to latest version
-npm install -g weather-cli
+npm install -g weather-cli-16bit
 
 # Test new format
 weather "New York, US"

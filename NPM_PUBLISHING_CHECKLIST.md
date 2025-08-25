@@ -69,7 +69,7 @@ npm publish --access public
 npm view @16bitweather/weather-cli
 
 # Test global installation from npm
-npm install -g @16bitweather/weather-cli
+npm install -g weather-cli-16bit
 
 # Verify it works
 weather --version
@@ -106,7 +106,7 @@ weather --version
 The package should be considered successfully published when:
 
 1. `npm view @16bitweather/weather-cli` returns package information
-2. `npm install -g @16bitweather/weather-cli` installs without errors
+2. `npm install -g weather-cli-16bit` installs without errors
 3. `weather --version` returns `0.3.1`
 4. All weather CLI commands function properly
 5. Package appears in npm search results

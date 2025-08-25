@@ -177,7 +177,7 @@ weather "Invalid Location"
 ### **Migration Guide**
 Users upgrading from v0.0.22 need to:
 1. Update to new format: `weather "City, State"`
-2. Reinstall dependencies: `npm install -g weather-cli`
+2. Reinstall dependencies: `npm install -g weather-cli-16bit`
 3. Test new features: `weather "New York, US"`
 
 ### **Help Resources**

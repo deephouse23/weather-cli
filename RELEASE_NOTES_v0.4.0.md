@@ -99,7 +99,7 @@ weather interactive           # Interactive mode
 
 ### Global Installation (Recommended)
 ```bash
-npm install -g weather-cli
+npm install -g weather-cli-16bit
 weather "San Francisco"
 ```
 
@@ -116,7 +116,7 @@ weather "London"
 
 ### First Time Setup
 1. Get a free API key at [OpenWeatherMap](https://openweathermap.org/api)
-2. Install Weather CLI: `npm install -g weather-cli`
+2. Install Weather CLI: `npm install -g weather-cli-16bit`
 3. Set up your API key: `weather auth set`
 4. Test it works: `weather auth test`
 5. Start using: `weather "Your City"`

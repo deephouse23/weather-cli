@@ -1,11 +1,11 @@
 # weather-cli-16bit v0.3.1 🌤️
 
+[![npm install](https://img.shields.io/badge/npm%20install-weather--cli--16bit-red)](https://www.npmjs.com/package/weather-cli-16bit)
 ![npm version](https://img.shields.io/badge/npm-v0.3.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node.js](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
 
 Part of the 16bitweather suite of weather tools
 
@@ -466,6 +466,7 @@ MIT License - see [LICENSE](LICENSE) file for details. Created by 16bitweather.
 
 ## 🌐 **Links**
 
+- **NPM Package**: [weather-cli-16bit](https://www.npmjs.com/package/weather-cli-16bit)
 - **Homepage**: [16bitweather.co](https://16bitweather.co)
 - **Repository**: [GitHub](https://github.com/deephouse23/weather-cli)
 - **Issues**: [GitHub Issues](https://github.com/deephouse23/weather-cli/issues)
