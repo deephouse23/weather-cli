@@ -5,7 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.4.0] - 2025-08-25
+## [0.3.1] - 2025-08-25
+
+### 📦 **NPM Package Release**
+- **Global Installation**: Now available as `@16bitweather/weather-cli` on npm
+- **Unique Package Name**: Uses scoped name to avoid npm conflicts
+- **Proper Bin Structure**: Added `bin/weather.js` executable with cross-platform compatibility
+- **NPM Ready**: Complete package configuration with proper files, engines, and metadata
+
+### 🔧 **Package Configuration**
+- **Semantic Versioning**: Updated to v0.3.1 following semver standards
+- **Node.js Requirements**: Requires Node.js v14.0.0 or higher
+- **Cross-Platform Support**: Works on macOS, Windows, and Linux
+- **NPM Ignore**: Proper `.npmignore` file excluding development files
+
+### 📚 **Documentation Updates**
+- **Installation Guide**: Updated README with npm installation instructions
+- **Package Information**: Added NPM package details and update commands
+- **Usage Examples**: Enhanced examples for global installation
+- **Version Alignment**: All version references updated to v0.3.1
+
+## [0.4.0] - 2025-08-25 (Previous Release)
 
 ### 🔍 **Added**
 - **Smart location parsing** that automatically tries multiple search formats

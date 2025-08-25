@@ -1,0 +1,52 @@
+# Development files
+.claude/
+.git/
+.github/
+node_modules/
+
+# Test files
+test-*.js
+smoke-test.sh
+
+# Documentation (extra - main docs are included via files field)
+CHANGELOG_v*.md
+CLEAN_BRANCH_SUMMARY.md
+CONTRIBUTING.md
+FINAL_SECURITY_SUMMARY.md
+GITHUB_*.md
+PR_*.md
+RELEASE_COMMANDS.md
+RELEASE_NOTES_v*.md
+SECURITY_REVIEW.md
+V0.3.0-SECURITY-SUMMARY.md
+
+# Environment files
+.env
+.env.*
+.weather-cache.json
+.weather-config.json
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
+coverage/
+
+# Cache directories
+.cache/
+.npm/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp

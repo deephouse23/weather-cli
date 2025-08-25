@@ -1,7 +1,8 @@
-# Weather CLI v0.4.0 🌤️
+# @16bitweather/weather-cli v0.3.1 🌤️
 
+![npm version](https://img.shields.io/badge/npm-v0.3.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.4.0-orange)
+![Node.js](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
@@ -12,7 +13,15 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 
 **✨ Now with simplified global installation! Just type `weather "City, State"` from anywhere on your system.**
 
-## 🆕 **What's New in v0.4.0** - Enhanced Location Search & Auth Commands
+## 🆕 **What's New in v0.3.1** - NPM Package Ready!
+
+### 📦 **Easy Global Installation**
+- **NPM Package**: Now available as `@16bitweather/weather-cli` on npm
+- **One Command Setup**: Install globally with `npm install -g @16bitweather/weather-cli`
+- **Instant Access**: Use `weather` command from anywhere on your system
+- **Auto-Updates**: Easy updates with `npm update -g @16bitweather/weather-cli`
+
+### 🔍 **Enhanced Location Search** (from v0.4.0)
 
 ### 🔍 **Smart Location Parsing**
 - **Multiple format support**: Automatically tries different location formats when searching
@@ -46,18 +55,31 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 - **Smoke Tests**: End-to-end system validation
 - **Cross-Platform**: Verified on macOS, Windows, Linux
 
-## 🚀 **Quick Start**
+## 🚀 **Installation**
 
-### **Installation**
+### **Method 1: NPM Global Installation (Recommended)**
 ```bash
-# Global installation
-npm install -g weather-cli
+# Install globally from npm
+npm install -g @16bitweather/weather-cli
 
-# Or clone and install locally
+# Start using immediately
+weather "San Francisco, CA"
+```
+
+### **Method 2: From GitHub Source**
+```bash
+# Clone and install locally
 git clone https://github.com/deephouse23/weather-cli.git
 cd weather-cli
 npm install
+npm link  # Creates global symlink
 ```
+
+### **Requirements**
+- Node.js v14.0.0 or higher
+- npm (comes with Node.js)
+- Internet connection for weather data
+- OpenWeatherMap API key (free at [openweathermap.org](https://openweathermap.org/api))
 
 ### **Setup**
 ```bash
@@ -212,22 +234,24 @@ src/
 - **Responsive design** that adapts to terminal size
 - **Enhanced user experience** with clear requirements
 
-## 📊 **Installation Options**
+## 📊 **Package Information**
 
-### **Global Installation (Recommended)**
-```bash
-npm install -g weather-cli
-weather "New York, US"
-```
+### **NPM Package Details**
+- **Package Name**: `@16bitweather/weather-cli`
+- **Global Command**: `weather`
+- **Minimum Node Version**: v14.0.0
+- **Supported Platforms**: macOS, Windows, Linux
 
-### **Local Development**
+### **Update Instructions**
 ```bash
-git clone https://github.com/deephouse23/weather-cli.git
-cd weather-cli
-npm install
-cp .env.example .env
-# Edit .env with your API key
-node index.js "New York, US"
+# Check current version
+npm list -g @16bitweather/weather-cli
+
+# Update to latest version
+npm update -g @16bitweather/weather-cli
+
+# Uninstall if needed
+npm uninstall -g @16bitweather/weather-cli
 ```
 
 ## 🔧 **Configuration**
@@ -403,7 +427,7 @@ cp .env.example .env
 
 ## 📝 **Changelog**
 
-### **v0.4.0** (Latest) - Enhanced Location Search & Auth Commands
+### **v0.3.1** (Latest) - NPM Package Release
 - 🔍 **SEARCH**: Smart location parsing with multiple format attempts
 - 🔍 **SEARCH**: Automatic fallback for different location formats
 - 🔍 **SEARCH**: Support for city names without state/country
