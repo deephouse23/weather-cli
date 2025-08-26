@@ -146,6 +146,7 @@ async function getWeather(location, userUnits = null) {
 
   const spinner = ora('Fetching weather data...').start();
   
+  
   try {
     // First, get location info to determine regional preferences
     const weatherResponse = await httpClient.get(`${BASE_URL}/weather`, {
@@ -155,6 +156,7 @@ async function getWeather(location, userUnits = null) {
         units: 'metric' // Always fetch in metric first to get country code
       }
     });
+
 
     const countryCode = weatherResponse.data.sys.country;
     const unitSystem = determineDisplayUnits(countryCode, userUnits);
@@ -202,13 +204,15 @@ async function getWeather(location, userUnits = null) {
       countryCode: countryCode
     };
     
+    
     return data;
   } catch (error) {
     spinner.fail('Failed to fetch weather data');
     
+    
     if (error.response?.status === 404) {
       throw new WeatherError(
-        `Location "${location}" not found. Please check the spelling.`,
+        `Location "${location}" not found. Please check the spelling or try: "City, Country Code" (e.g., "San Ramon, US")`,
         ERROR_CODES.LOCATION_NOT_FOUND,
         404
       );

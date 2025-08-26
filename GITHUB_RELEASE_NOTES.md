@@ -23,7 +23,7 @@ Install once, use anywhere on your system:
 ```bash
 git clone https://github.com/deephouse23/weather-cli.git
 cd weather-cli
-npm install && npm install -g .
+npm install && npm install -g weather-cli-16bit
 
 # Now available globally!
 weather london
@@ -37,7 +37,7 @@ weather tokyo --forecast
 # Clone and install
 git clone https://github.com/deephouse23/weather-cli.git
 cd weather-cli
-npm install && npm install -g .
+npm install && npm install -g weather-cli-16bit
 
 # Set up API key  
 cp .env.example .env

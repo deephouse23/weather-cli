@@ -21,11 +21,33 @@ export function validateLocation(location) {
     throw new WeatherError('Location cannot be empty', ERROR_CODES.INVALID_INPUT);
   }
   
-  if (!sanitized.includes(',')) {
-    throw new WeatherError(
-      'Invalid location format. Please use: "City, State" or "City, Country"',
-      ERROR_CODES.INVALID_INPUT
-    );
+  // Allow locations with or without commas
+  // If it has a comma, ensure state/country code is 2 letters
+  if (sanitized.includes(',')) {
+    const parts = sanitized.split(',').map(p => p.trim());
+    if (parts.length === 2) {
+      const [city, stateOrCountry] = parts;
+      // Convert state codes to country codes for OpenWeatherMap
+      // CA (California) -> US, etc.
+      const stateToCountry = {
+        'AL': 'US', 'AK': 'US', 'AZ': 'US', 'AR': 'US', 'CA': 'US',
+        'CO': 'US', 'CT': 'US', 'DE': 'US', 'FL': 'US', 'GA': 'US',
+        'HI': 'US', 'ID': 'US', 'IL': 'US', 'IN': 'US', 'IA': 'US',
+        'KS': 'US', 'KY': 'US', 'LA': 'US', 'ME': 'US', 'MD': 'US',
+        'MA': 'US', 'MI': 'US', 'MN': 'US', 'MS': 'US', 'MO': 'US',
+        'MT': 'US', 'NE': 'US', 'NV': 'US', 'NH': 'US', 'NJ': 'US',
+        'NM': 'US', 'NY': 'US', 'NC': 'US', 'ND': 'US', 'OH': 'US',
+        'OK': 'US', 'OR': 'US', 'PA': 'US', 'RI': 'US', 'SC': 'US',
+        'SD': 'US', 'TN': 'US', 'TX': 'US', 'UT': 'US', 'VT': 'US',
+        'VA': 'US', 'WA': 'US', 'WV': 'US', 'WI': 'US', 'WY': 'US'
+      };
+      
+      const upperStateOrCountry = stateOrCountry.toUpperCase();
+      if (stateToCountry[upperStateOrCountry]) {
+        // It's a US state code, convert to country format
+        return `${city}, ${stateToCountry[upperStateOrCountry]}`;
+      }
+    }
   }
   
   return sanitized;

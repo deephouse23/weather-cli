@@ -1,26 +1,42 @@
 {
-  "name": "weather-cli",
+  "name": "weather-cli-16bit",
   "version": "0.3.1",
-  "description": "A beautiful CLI weather application (Beta)",
+  "description": "A beautiful command-line weather application with smart location search and secure API key management",
   "main": "index.js",
   "type": "module",
   "bin": {
-    "weather": "./index.js"
+    "weather": "./bin/weather.js"
   },
   "preferGlobal": true,
-  "stability": "beta",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "os": ["darwin", "linux", "win32"],
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
-    "test": "node test-modules.js"
+    "start": "node bin/weather.js",
+    "dev": "node --watch bin/weather.js",
+    "test": "node test-modules.js",
+    "lint": "echo 'No linting configured'",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "weather",
     "cli",
     "terminal",
     "forecast",
-    "horizontal-layout",
-    "responsive-design"
+    "openweathermap",
+    "location-search",
+    "secure-auth",
+    "responsive-design",
+    "weather-forecast",
+    "command-line"
   ],
   "author": "16bitweather <justinelrod111@gmail.com>",
   "license": "MIT",

@@ -80,7 +80,7 @@ To use the updated version:
 npm link
 
 # Or install globally from GitHub
-npm install -g git+https://github.com/deephouse23/weather-cli.git#v0.3.1
+npm install -g weather-cli-16bit
 ```
 
 ## Future Improvements

@@ -5,6 +5,66 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-08-25
+
+### 📦 **NPM Package Release**
+- **Global Installation**: Now available as `weather-cli-16bit` on npm
+- **Unique Package Name**: Uses scoped name to avoid npm conflicts
+- **Proper Bin Structure**: Added `bin/weather.js` executable with cross-platform compatibility
+- **NPM Ready**: Complete package configuration with proper files, engines, and metadata
+
+### 🔧 **Package Configuration**
+- **Semantic Versioning**: Updated to v0.3.1 following semver standards
+- **Node.js Requirements**: Requires Node.js v14.0.0 or higher
+- **Cross-Platform Support**: Works on macOS, Windows, and Linux
+- **NPM Ignore**: Proper `.npmignore` file excluding development files
+
+### 📚 **Documentation Updates**
+- **Installation Guide**: Updated README with npm installation instructions
+- **Package Information**: Added NPM package details and update commands
+- **Usage Examples**: Enhanced examples for global installation
+- **Version Alignment**: All version references updated to v0.3.1
+
+## [0.4.0] - 2025-08-25 (Previous Release)
+
+### 🔍 **Added**
+- **Smart location parsing** that automatically tries multiple search formats
+- **Flexible location input** - works with just city names, no state/country required
+- **Automatic fallback searches** - tries variations like "US" and "USA"
+- **Better error messages** showing all attempted searches
+- **Support for multiple formats**: "City", "City, State", "City, Country", zip codes
+
+### 🐛 **Fixed**
+- Resolved merge conflicts from v0.3.0 integration
+- Fixed duplicate code sections in index.js
+- Corrected auth command structure
+- Fixed command parsing for various input formats
+
+### 📝 **Changed**
+- Enhanced location search algorithm for better results
+- Improved error messages with helpful suggestions
+- Updated documentation with new examples
+
+## [0.3.0] - 2025-01-08
+
+### 🔒 **Security**
+- **OS Keychain Integration** - API keys stored securely using keytar
+- **Zero Exposure** - API keys never appear in logs or error messages
+- **Input Sanitization** - Comprehensive protection against injection attacks
+- **Auth Commands** - New `weather auth set` and `weather auth test` commands
+
+### ⚡ **Reliability**
+- **No More Crashes** - Eliminated all process.exit() calls from libraries
+- **Smart Retry Logic** - Automatic retry with exponential backoff
+- **Structured Errors** - Specific error codes with recovery suggestions
+- **Timeout Protection** - 5-second timeout prevents hanging requests
+
+### 📦 **Caching**
+- **Size Limits** - Maximum 100 entries prevent unlimited growth
+- **Age Limits** - 7-day maximum age for cache entries
+- **LRU Eviction** - Intelligent removal of least-used entries
+- **Cache Safety** - Failures don't affect weather lookups
+
 ## [0.0.24] - 2025-01-07
 
 ### 🎨 **Added**
