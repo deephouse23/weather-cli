@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2025-08-26
+
+### 🐛 **Fixed**
+- **State Code Support**: Fixed US state code (CA) to country code (US) conversion for OpenWeatherMap API
+- **Data Structure Error**: Fixed "Cannot read properties of undefined" error in weather display
+- **CLI Crashes**: Removed duplicate command definitions that were causing application crashes
+
+### 🔧 **Improved**
+- **Location Flexibility**: Now accepts locations with or without comma separators
+- **State Mapping**: Added automatic state-to-country code mapping for all 50 US states
+- **Error Messages**: Enhanced error messages with helpful examples like "San Ramon, US"
+- **Data Validation**: Added proper data structure validation in display module
+
+### 🧪 **Tested**
+- Works with `weather "San Ramon, CA"` - automatically converts to US
+- Case insensitive: `weather "san ramon, ca"` works correctly
+- Flexible input: `weather "san ramon"` works without state/country code
+- Invalid locations show helpful error messages
+
 ## [0.3.1] - 2025-08-25
 
 ### 📦 **NPM Package Release**
