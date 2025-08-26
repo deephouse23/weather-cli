@@ -82,7 +82,15 @@ function getTerminalWidth() {
 
 // Display current weather in horizontal layout
 function displayCurrentWeather(data, displayUnit) {
-  const weather = data.current;
+  // Check if data has current property or is the weather data directly
+  const weather = data.current || data;
+  
+  // Add safety checks for weather data
+  if (!weather || !weather.weather || !weather.weather[0]) {
+    console.error(chalk.red('❌ Invalid weather data structure'));
+    return;
+  }
+  
   const emoji = weatherEmojis[weather.weather[0].main] || '🌤️';
   const terminalWidth = getTerminalWidth();
   
