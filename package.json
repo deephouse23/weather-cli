@@ -1,7 +1,7 @@
 {
   "name": "weather-cli-16bit",
-  "version": "0.3.2",
-  "description": "A beautiful command-line weather application with smart location search and secure API key management",
+  "version": "0.3.21",
+  "description": "A simple, intelligent weather CLI with smart location detection - no quotes needed",
   "main": "index.js",
   "type": "module",
   "bin": {
@@ -11,7 +11,11 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "os": ["darwin", "linux", "win32"],
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
   "files": [
     "bin/",
     "src/",
@@ -29,14 +33,16 @@
   "keywords": [
     "weather",
     "cli",
-    "terminal",
+    "command-line",
     "forecast",
+    "temperature",
+    "no-quotes",
+    "smart-location",
     "openweathermap",
     "location-search",
     "secure-auth",
     "responsive-design",
-    "weather-forecast",
-    "command-line"
+    "weather-forecast"
   ],
   "author": "16bitweather <justinelrod111@gmail.com>",
   "license": "MIT",

@@ -16,6 +16,7 @@ import { processTemperatureOptions, getDefaultLocation, getDefaultUnits, setDefa
 import { WeatherError, mapErrorToExitCode } from './src/utils/errors.js';
 import { getApiKey, setApiKey, testApiKey } from './src/api/auth.js';
 import { sanitizeLocation } from './src/utils/validators.js';
+import { parseLocation } from './src/utils/locationParser.js';
 
 // Load environment variables
 dotenv.config();
@@ -34,7 +35,7 @@ function showBetaBanner() {
 ╔══════════════════════════════════════╗
 ║              BETA SOFTWARE           ║
 ║                                      ║
-║    Weather CLI v0.3.1                ║
+║    Weather CLI v${VERSION}               ║
 ║    Under active development          ║
 ║                                      ║
 ║    Feedback & bugs welcome at:       ║
@@ -381,12 +382,20 @@ async function main() {
       // No arguments, start interactive mode
       showBetaBanner();
       await interactiveMode();
-    } else if (args.length > 0 && (!knownCommands.includes(args[0]) || args.includes('--no-beta-banner')) && args.filter(arg => !knownOptions.includes(arg) && !arg.match(/^(metric|imperial|celsius|fahrenheit|auto)$/)).length > 0) {
-      // First argument is not a known command and doesn't start with -, treat as location for current weather
+    } else if (args.length > 0 && !knownCommands.includes(args[0])) {
+      // First argument is not a known command, treat as location for current weather
       if (!args.includes('--no-beta-banner')) {
         showBetaBanner();
       }
-      const location = args.join(' ');
+      
+      // Use parseLocation to intelligently parse the location
+      const location = parseLocation(args);
+      
+      if (!location) {
+        console.error(chalk.red('❌ Please specify a location'));
+        console.log(chalk.yellow('Examples: weather CA, weather San Ramon CA, weather London'));
+        process.exit(1);
+      }
       
       // Process temperature options
       const options = {
@@ -400,9 +409,7 @@ async function main() {
       const showForecast = args.includes('-f') || args.includes('--forecast');
       const showAlerts = args.includes('-a') || args.includes('--alerts');
       
-      const cleanLocation = location.replace(/(-u|--units|metric|imperial|celsius|fahrenheit|auto|-f|--forecast|-a|--alerts|--celsius|--fahrenheit|--no-beta-banner)/g, '').trim();
-      
-      const data = await getWeather(cleanLocation, userUnits);
+      const data = await getWeather(location, userUnits);
       displayCurrentWeather(data, data.displayUnit);
       
       if (showAlerts) {

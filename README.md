@@ -1,7 +1,7 @@
-# weather-cli-16bit v0.3.1 🌤️
+# weather-cli-16bit v0.3.21 🌤️
 
-[![npm install](https://img.shields.io/badge/npm%20install-weather--cli--16bit-red)](https://www.npmjs.com/package/weather-cli-16bit)
-![npm version](https://img.shields.io/badge/npm-v0.3.1-blue)
+[![npm version](https://badge.fury.io/js/weather-cli-16bit.svg)](https://www.npmjs.com/package/weather-cli-16bit)
+[![GitHub Actions](https://github.com/deephouse23/weather-cli/workflows/NPM%20Publish%20on%20PR%20Merge/badge.svg)](https://github.com/deephouse23/weather-cli/actions)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node.js](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
@@ -11,7 +11,16 @@ Part of the 16bitweather suite of weather tools
 
 A beautiful command-line weather application with **horizontal layout**, **responsive design**, and **enhanced features** for any location.
 
-**✨ Now with simplified global installation! Just type `weather "City, State"` from anywhere on your system.**
+**✨ Now with no quotes needed! Just type `weather San Ramon CA` from anywhere on your system.**
+
+## 🎉 **What's New in v0.3.21** - Smart Location Parsing
+
+### 🚀 **Major Improvements**
+- **No quotes needed!** Type naturally: `weather San Ramon CA`
+- **Smart location detection**: Just type `weather CA` for California
+- **Global support**: Works with provinces, states, and country codes
+- **Fixed version display**: Banner now shows correct version
+- **Auto NPM publishing**: Merging PRs automatically publishes to npm
 
 ## 🆕 **What's New in v0.3.1** - NPM Package Ready!
 
@@ -63,7 +72,7 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 npm install -g weather-cli-16bit
 
 # Start using immediately
-weather "San Francisco, CA"
+weather San Francisco CA
 ```
 
 ### **Method 2: From GitHub Source**
@@ -95,44 +104,70 @@ cp .env.example .env
 # Get your free API key at: https://openweathermap.org/api
 ```
 
-### **Usage**
+### **Usage Examples**
+
+#### 🇺🇸 **US States (no quotes needed!)**
 ```bash
-# Basic weather lookup - flexible formats supported!
-weather "San Ramon"           # City name only
-weather "San Ramon, CA"       # City, State
-weather "New York, US"        # City, Country Code
-weather "London, UK"          # International cities
-weather "94583"               # US Zip codes
-weather "Tokyo"               # Major cities worldwide
+weather CA                    # California
+weather Texas                 # Texas (full name)
+weather NY                    # New York
+```
+
+#### 🏙️ **Cities (no quotes needed!)**
+```bash
+weather San Ramon CA          # San Ramon, California
+weather New York              # Auto-detects NYC
+weather Los Angeles CA        # LA with state
+weather San Francisco         # Auto-detects SF
+```
+
+#### 🌍 **International**
+```bash
+weather London                # Auto-detects UK
+weather Tokyo                 # Auto-detects Japan
+weather Paris                 # Auto-detects France
+weather BC                    # British Columbia, Canada
+weather Ontario               # Ontario, Canada
+```
+
+#### 📊 **All Commands**
+```bash
+# Basic weather lookup - no quotes needed!
+weather San Ramon             # City name only
+weather San Ramon CA          # City, State
+weather New York US           # City, Country Code
+weather London                # International cities
+weather 94583                 # US Zip codes
+weather Tokyo                 # Major cities worldwide
 
 # Get forecasts
-weather forecast "London"      # 24-hour forecast
-weather 5day "Tokyo"          # 5-day forecast
+weather forecast London       # 24-hour forecast
+weather 5day Tokyo           # 5-day forecast
 
 # Compare cities
-weather compare "New York" "London"
+weather compare "New York" London
 
 # GPS coordinates
 weather coords 37.7749,-122.4194
 
 # Interactive mode
-weather                        # No arguments starts interactive mode
-weather interactive           # Explicit interactive mode
+weather                       # No arguments starts interactive mode
+weather interactive          # Explicit interactive mode
 
 # Configuration
-weather config                 # Set default location and units
+weather config               # Set default location and units
 
 # Cache management
-weather cache                  # View cache statistics
-weather cache -c              # Clear cache
+weather cache                # View cache statistics
+weather cache -c            # Clear cache
 
-# Authentication (NEW!)
-weather auth set              # Store API key securely
-weather auth test             # Validate your API key
+# Authentication
+weather auth set            # Store API key securely
+weather auth test           # Validate your API key
 
 # Help system
-weather --help                # General help
-weather [command] --help      # Command-specific help
+weather --help              # General help
+weather [command] --help    # Command-specific help
 ```
 
 ## 🎨 **New Horizontal Layout**
@@ -455,6 +490,18 @@ cp .env.example .env
 ### **Previous Versions**
 - v0.0.23: Security improvements
 - v0.0.22: Initial beta release
+
+## 🤝 **Contributing**
+
+### Development
+1. Fork the repo
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push: `git push origin feature/amazing-feature`
+5. Open PR → Auto-publishes to npm when merged!
+
+### Automated Release Process
+This project uses GitHub Actions to automatically publish to npm when PRs are merged to main.
 
 ## 📄 **License**
 
