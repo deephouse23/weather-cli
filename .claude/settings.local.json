@@ -24,7 +24,10 @@
       "Bash(git merge:*)",
       "Bash(git checkout:*)",
       "Bash(npm version:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(npm run test:ci:*)",
+      "Bash(timeout:*)",
+      "Bash(npm run:*)"
     ],
     "deny": []
   }

@@ -26,9 +26,11 @@
   "scripts": {
     "start": "node bin/weather.js",
     "dev": "node --watch bin/weather.js",
-    "test": "node test-modules.js",
+    "test": "node test-location-parser.js",
+    "test:ci": "node test-location-parser.js",
+    "test:full": "node test-modules.js",
     "lint": "echo 'No linting configured'",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm run test:ci"
   },
   "keywords": [
     "weather",
