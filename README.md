@@ -503,6 +503,12 @@ cp .env.example .env
 ### Automated Release Process
 This project uses GitHub Actions to automatically publish to npm when PRs are merged to main.
 
+#### Testing in CI
+- Uses keytar-free tests for GitHub Actions compatibility
+- Installs system dependencies (libsecret) for full functionality
+- Fallback publish strategy if tests fail
+- Location parser tests ensure core functionality works
+
 ## 📄 **License**
 
 MIT License - see [LICENSE](LICENSE) file for details. Created by 16bitweather.
