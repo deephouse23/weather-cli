@@ -11,7 +11,7 @@ import { dirname, join } from 'path';
 // Import our modules
 import { getWeather, getWeatherByCoords } from './src/weather.js';
 import { getCachedWeather, setCachedWeather, cleanExpiredCache, getCacheStats, clearCache } from './src/cache.js';
-import { displayCurrentWeather, display5DayForecast, display24HourForecast } from './src/display.js';
+import { displayCurrentWeather, display5DayForecast, display24HourForecast, displayWeatherBanner } from './src/display.js';
 import { processTemperatureOptions, getDefaultLocation, getDefaultUnits, setDefaultLocation, setDefaultUnits } from './src/config.js';
 import { WeatherError, mapErrorToExitCode } from './src/utils/errors.js';
 import { getApiKey, setApiKey, testApiKey } from './src/api/auth.js';
@@ -77,6 +77,8 @@ async function compareWeather(city1, city2, userUnits = null) {
 
 // Interactive mode
 async function interactiveMode() {
+  displayWeatherBanner();
+  
   const defaultLocation = await getDefaultLocation();
   const defaultUnits = await getDefaultUnits();
   
