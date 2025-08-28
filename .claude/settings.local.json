@@ -33,7 +33,8 @@
       "Bash(export COLUMNS=80)",
       "Bash(gh pr view:*)",
       "Bash(grep:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(npm publish:*)"
     ],
     "deny": []
   },
