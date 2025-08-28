@@ -1,68 +1,60 @@
-# weather-cli-16bit v0.3.21 🌤️
+# weather-cli-16bit v0.3.23 🌤️
 
 [![npm version](https://badge.fury.io/js/weather-cli-16bit.svg)](https://www.npmjs.com/package/weather-cli-16bit)
 [![GitHub Actions](https://github.com/deephouse23/weather-cli/workflows/NPM%20Publish%20on%20PR%20Merge/badge.svg)](https://github.com/deephouse23/weather-cli/actions)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node.js](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
-![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
+![Testing](https://img.shields.io/badge/testing-Playwright-green.svg)
 
 Part of the 16bitweather suite of weather tools
 
-A beautiful command-line weather application with **horizontal layout**, **responsive design**, and **enhanced features** for any location.
+A beautiful command-line weather application with **horizontal layout**, **responsive design**, **comprehensive testing**, and **enhanced features** for any location.
 
 **✨ Now with no quotes needed! Just type `weather San Ramon CA` from anywhere on your system.**
 
-## 🎉 **What's New in v0.3.21** - Smart Location Parsing
+## 🎉 **What's New in v0.3.23** - Comprehensive Testing & Enhanced Display
 
-### 🚀 **Major Improvements**
+### 🧪 **Major Testing Infrastructure**
+- **Playwright Integration**: Complete end-to-end testing framework
+- **Automated Testing**: Comprehensive test suites for CLI validation
+- **Test Coverage**: Weather commands, error handling, and display formatting
+- **CI/CD Ready**: Tests run automatically on publish
+
+### 🎨 **Enhanced Display System**
+- **Improved Formatting**: Better alignment and layout consistency
+- **Responsive Design**: Optimized for all terminal sizes
+- **Visual Polish**: Enhanced color coding and spacing
+- **Error Presentation**: Better error message formatting
+
+### 🔧 **Configuration & Development**
+- **MCP Integration**: Enhanced Model Context Protocol support
+- **Development Tools**: Improved testing and debugging capabilities
+- **Package Optimization**: Streamlined dependencies and build process
+
+## 🆕 **Previous Major Updates**
+
+### **v0.3.21** - Smart Location Parsing
 - **No quotes needed!** Type naturally: `weather San Ramon CA`
 - **Smart location detection**: Just type `weather CA` for California
 - **Global support**: Works with provinces, states, and country codes
 - **Fixed version display**: Banner now shows correct version
 - **Auto NPM publishing**: Merging PRs automatically publishes to npm
 
-## 🆕 **What's New in v0.3.1** - NPM Package Ready!
-
-### 📦 **Easy Global Installation**
+### **v0.3.1** - NPM Package Ready
 - **NPM Package**: Now available as `weather-cli-16bit` on npm
 - **One Command Setup**: Install globally with `npm install -g weather-cli-16bit`
 - **Instant Access**: Use `weather` command from anywhere on your system
 - **Auto-Updates**: Easy updates with `npm update -g weather-cli-16bit`
 
-### 🔍 **Enhanced Location Search** (from v0.4.0)
-
-### 🔍 **Smart Location Parsing**
-- **Multiple format support**: Automatically tries different location formats when searching
-- **Flexible input**: Works with "City", "City, State", "City, Country", zip codes, and more
-- **Better error messages**: Shows all attempted searches and provides helpful suggestions
-- **Automatic fallback**: Tries variations like "San Ramon, US" and "San Ramon, USA"
-
-## 📚 **v0.3.0 Features** - Security & Reliability Release
-
-### 🔒 **Enterprise Security**
+### **v0.3.0** - Security & Reliability Release
 - **OS Keychain Integration**: API keys stored securely using `keytar`
 - **Zero Exposure**: API keys never appear in logs or error messages
 - **Input Sanitization**: Comprehensive protection against injection attacks
 - **Secure Commands**: New `weather auth set` and `weather auth test` commands
-
-### ⚡ **Bulletproof Reliability**
 - **No More Crashes**: Eliminated all `process.exit()` calls from libraries
 - **Smart Retry Logic**: Automatic retry with exponential backoff for network issues
-- **Structured Errors**: Specific error codes with actionable recovery suggestions
-- **Timeout Protection**: 5-second timeout prevents hanging requests
-
-### 📦 **Enhanced Caching**
-- **Size Limits**: Maximum 100 entries prevent unlimited growth
-- **Age Limits**: 7-day maximum age for cache entries
-- **LRU Eviction**: Intelligent removal of least-used entries
-- **Cache Safety**: Failures don't affect weather lookups
-
-### 🧪 **Comprehensive Testing**
-- **Security Tests**: Validator and authentication test suites
-- **Performance Tests**: Benchmarks for API calls and cache hits
-- **Smoke Tests**: End-to-end system validation
-- **Cross-Platform**: Verified on macOS, Windows, Linux
+- **Enhanced Caching**: Size limits (100 entries), age limits (7 days), LRU eviction
 
 ## 🚀 **Installation**
 
@@ -104,16 +96,16 @@ cp .env.example .env
 # Get your free API key at: https://openweathermap.org/api
 ```
 
-### **Usage Examples**
+## 📖 **Usage Examples**
 
-#### 🇺🇸 **US States (no quotes needed!)**
+### 🇺🇸 **US States (no quotes needed!)**
 ```bash
 weather CA                    # California
 weather Texas                 # Texas (full name)
 weather NY                    # New York
 ```
 
-#### 🏙️ **Cities (no quotes needed!)**
+### 🏙️ **Cities (no quotes needed!)**
 ```bash
 weather San Ramon CA          # San Ramon, California
 weather New York              # Auto-detects NYC
@@ -121,7 +113,7 @@ weather Los Angeles CA        # LA with state
 weather San Francisco         # Auto-detects SF
 ```
 
-#### 🌍 **International**
+### 🌍 **International**
 ```bash
 weather London                # Auto-detects UK
 weather Tokyo                 # Auto-detects Japan
@@ -130,7 +122,7 @@ weather BC                    # British Columbia, Canada
 weather Ontario               # Ontario, Canada
 ```
 
-#### 📊 **All Commands**
+### 📊 **All Commands**
 ```bash
 # Basic weather lookup - no quotes needed!
 weather San Ramon             # City name only
@@ -170,7 +162,7 @@ weather --help              # General help
 weather [command] --help    # Command-specific help
 ```
 
-## 🎨 **New Horizontal Layout**
+## 🎨 **Enhanced Display System**
 
 ### **Large Terminal Display**
 ```
@@ -205,23 +197,34 @@ weather "Sydney" -u imperial  # Use imperial (Fahrenheit)
 - **Medium terminals** (80-120 chars): Medium layout with basic sections
 - **Small terminals** (<80 chars): Compact layout with combined info
 
-## 📋 **Required Format**
+## 🧪 **Testing & Quality Assurance**
 
-### **✅ Correct Usage**
+### **Comprehensive Test Suite**
 ```bash
-weather "San Ramon, US"      # City, Country
-weather "New York, US"       # City, Country  
-weather "London, UK"         # City, Country
-weather "Tokyo, JP"          # City, Country
-weather "Paris, FR"          # City, Country
+# Run all tests
+npm test                      # Core functionality tests
+npm run test:e2e             # Playwright end-to-end tests
+npm run test:e2e:ui          # Run tests with UI mode
+npm run test:e2e:debug       # Debug mode for tests
+
+# Individual test suites
+node test-location-parser.js  # Location parsing validation
+node test-modules.js         # Module functionality tests
 ```
 
-### **❌ Invalid Usage**
-```bash
-weather "San Ramon"          # Missing state/country
-weather "New York"           # Missing state/country
-weather "London"             # Missing state/country
-```
+### **Test Coverage**
+- **Location Parsing**: 25+ test cases for location format validation
+- **API Integration**: Weather data retrieval and error handling
+- **Display Formatting**: Terminal rendering and responsive design
+- **Authentication**: Secure API key management
+- **Caching System**: Cache hit/miss scenarios and expiration
+- **Error Handling**: Network failures, invalid inputs, API errors
+
+### **Playwright E2E Testing**
+- **Real CLI Testing**: Tests actual command execution
+- **Cross-Platform**: Windows, macOS, and Linux compatibility
+- **User Scenarios**: Complete user workflows from installation to usage
+- **Error Scenarios**: Invalid inputs, network issues, API failures
 
 ## 🛠️ **Features**
 
@@ -237,6 +240,7 @@ weather "London"             # Missing state/country
 - **Responsive design** for any screen size
 - **Color-coded information** with emojis
 - **Prominent location display** with city/state highlighting
+- **Improved formatting** with better alignment and spacing
 
 ### **📦 Smart Caching**
 - **30-minute cache expiration** for fresh data
@@ -260,7 +264,23 @@ src/
 ├── weather.js      # API calls and weather logic
 ├── cache.js        # Caching with expiration
 ├── display.js      # UI formatting and output
-└── config.js       # Configuration management
+├── config.js       # Configuration management
+├── api/
+│   ├── auth.js     # Secure authentication
+│   └── http.js     # HTTP client with retry logic
+└── utils/
+    ├── errors.js   # Error handling utilities
+    ├── locationParser.js  # Smart location parsing
+    └── validators.js      # Input validation
+```
+
+### **Testing Infrastructure**
+```
+tests/
+├── simple-weather-test.spec.js    # Basic weather functionality
+├── weather-validation.spec.js     # Input validation tests
+├── playwright.config.js           # Playwright configuration
+└── test-location-parser.js        # Location parsing unit tests
 ```
 
 ### **Performance Improvements**
@@ -276,6 +296,7 @@ src/
 - **Global Command**: `weather`
 - **Minimum Node Version**: v14.0.0
 - **Supported Platforms**: macOS, Windows, Linux
+- **Testing Framework**: Playwright + Custom Test Suites
 
 ### **Update Instructions**
 ```bash
@@ -347,81 +368,15 @@ weather config
 | `-a, --alerts` | Show weather alerts | `weather "Miami" -a` |
 | `--no-beta-banner` | Hide beta banner | `weather "Paris" --no-beta-banner` |
 
-### **Cache Management**
-```bash
-# View cache statistics
-weather cache
-
-# Clean expired entries
-weather cache --clean
-
-# Clear all cache
-weather cache --clear
-```
-
-### **Authentication Management**
-```bash
-# Set API key securely in OS keychain
-weather auth set
-
-# Test API key without exposing it
-weather auth test
-```
-
-## 🧪 **Testing**
-
-### **Security & Validation Tests**
-```bash
-# Test input validators and sanitization
-node test-validators.js
-
-# Test authentication system
-node test-auth.cjs
-
-# Full system smoke test
-./smoke-test.sh
-```
-
-### **Performance & Module Tests**
-```bash
-# Run performance benchmarks
-node test-performance.js
-
-# Test responsive design
-node test-responsive.js
-```
-
 ## 📈 **Performance**
 
-### **v0.3.0 Performance Improvements**
-- **90%+ Cache Hit Rate**: Intelligent caching reduces API calls by 70%
-- **40% Faster Startup**: Optimized initialization process
-- **30% Less Memory**: Reduced peak memory usage
+### **v0.3.23 Performance Improvements**
+- **Enhanced Testing**: Playwright integration for comprehensive validation
+- **Improved Display**: Better formatting and alignment consistency
+- **Optimized Caching**: Smart cache management with 90%+ hit rate
 - **Sub-Second Responses**: Cached responses in <100ms
+- **Memory Optimization**: Reduced peak memory usage
 - **Smart Retry Logic**: Automatic recovery from network issues
-- **LRU Cache Eviction**: Prevents unlimited memory growth
-
-## 🎯 **Use Cases**
-
-### **Daily Weather Check**
-```bash
-weather "San Francisco, US"
-weather "London, UK"
-weather "Tokyo, JP"
-```
-
-### **Travel Planning**
-```bash
-weather "Paris, FR"
-weather "Sydney, AU"
-weather "Toronto, CA"
-```
-
-### **Cache Management**
-```bash
-weather cache          # Check cache status
-weather cache --clean  # Clean expired entries
-```
 
 ## 🚀 **Development**
 
@@ -443,71 +398,77 @@ npm install
 cp .env.example .env
 # Edit .env with your API key
 
+# Run tests
+npm test
+npm run test:e2e
+
 # Test installation
 node index.js "New York, US"
 ```
 
-## 🤝 **Contributing**
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
-### **Development Setup**
+### **Development Scripts**
 ```bash
-git clone https://github.com/deephouse23/weather-cli.git
-cd weather-cli
-npm install
-cp .env.example .env
-# Add your API key to .env
+npm run dev              # Development mode with auto-restart
+npm test                 # Run core functionality tests
+npm run test:e2e        # Run Playwright end-to-end tests
+npm run test:e2e:ui     # Run tests with Playwright UI
+npm run test:full       # Run all test suites
 ```
 
-## 📝 **Changelog**
-
-### **v0.3.1** (Latest) - NPM Package Release
-- 🔍 **SEARCH**: Smart location parsing with multiple format attempts
-- 🔍 **SEARCH**: Automatic fallback for different location formats
-- 🔍 **SEARCH**: Support for city names without state/country
-- 📝 **UX**: Better error messages showing all attempted searches
-- 📝 **UX**: Helpful suggestions for location format issues
-- 🐛 **FIX**: Resolved merge conflicts and duplicate code sections
-- 🐛 **FIX**: Fixed command structure for auth commands
-
-### **v0.3.0** - Security & Reliability Release
-- 🔒 **SECURITY**: OS keychain integration with `keytar` for secure API key storage
-- 🔒 **SECURITY**: Comprehensive input sanitization and validation
-- 🔒 **SECURITY**: New `weather auth set` and `weather auth test` commands
-- ⚡ **RELIABILITY**: Eliminated all `process.exit()` calls, proper error propagation
-- ⚡ **RELIABILITY**: HTTP client with 5-second timeout and exponential backoff
-- 📦 **CACHING**: Size limits (100 entries), age limits (7 days), LRU eviction
-- 🧪 **TESTING**: Comprehensive test suites for security, performance, and functionality
-- 📚 **DOCS**: Complete security summary and migration guide
-
-### **v0.0.24** - Horizontal Layout & Modular Architecture
-- ✨ **NEW**: Horizontal layout with responsive design
-- ✨ **NEW**: City, State format requirement
-- ✨ **NEW**: Modular architecture (4 focused modules)
-- ✨ **NEW**: Enhanced caching with expiration
-
-### **Previous Versions**
-- v0.0.23: Security improvements
-- v0.0.22: Initial beta release
-
 ## 🤝 **Contributing**
 
-### Development
+### **Development Process**
 1. Fork the repo
 2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push: `git push origin feature/amazing-feature`
-5. Open PR → Auto-publishes to npm when merged!
+3. Run tests: `npm test && npm run test:e2e`
+4. Commit changes: `git commit -m 'Add amazing feature'`
+5. Push: `git push origin feature/amazing-feature`
+6. Open PR → Auto-publishes to npm when merged!
 
-### Automated Release Process
+### **Testing Requirements**
+- All new features must include tests
+- Playwright tests for CLI functionality
+- Unit tests for core logic
+- Performance tests for caching and API calls
+
+### **Automated Release Process**
 This project uses GitHub Actions to automatically publish to npm when PRs are merged to main.
 
-#### Testing in CI
+#### **Testing in CI**
 - Uses keytar-free tests for GitHub Actions compatibility
 - Installs system dependencies (libsecret) for full functionality
 - Fallback publish strategy if tests fail
 - Location parser tests ensure core functionality works
+
+## 📝 **Changelog**
+
+### **v0.3.23** (Latest) - Comprehensive Testing & Enhanced Display
+- 🧪 **TESTING**: Added Playwright testing framework for end-to-end testing
+- 🧪 **TESTING**: Comprehensive test suites for weather CLI validation
+- 🎨 **DISPLAY**: Improved weather display formatting and layout alignment
+- 🔧 **CONFIG**: Enhanced configuration management with MCP integration
+- 📦 **DEPS**: Updated dependencies and configuration files
+- 🐛 **FIX**: Various bug fixes and performance improvements
+
+### **v0.3.21** - Smart Location Parsing
+- 🔍 **SEARCH**: No quotes needed - type naturally: `weather San Ramon CA`
+- 🔍 **SEARCH**: Smart location detection for states and countries
+- 🔍 **SEARCH**: Global support for provinces, states, country codes
+- 📝 **UX**: Fixed version display in banner
+- 🤖 **CI**: Auto NPM publishing on PR merge
+
+### **v0.3.1** - NPM Package Release
+- 📦 **NPM**: Global installation as `weather-cli-16bit`
+- 📦 **NPM**: Proper bin structure with cross-platform compatibility
+- 📚 **DOCS**: Updated documentation with npm installation guide
+- 🔧 **CONFIG**: Semantic versioning and Node.js requirements
+
+### **v0.3.0** - Security & Reliability Release
+- 🔒 **SECURITY**: OS keychain integration with `keytar`
+- 🔒 **SECURITY**: Comprehensive input sanitization and validation
+- ⚡ **RELIABILITY**: Eliminated all `process.exit()` calls
+- ⚡ **RELIABILITY**: HTTP client with timeout and exponential backoff
+- 📦 **CACHING**: Enhanced caching with size/age limits and LRU eviction
 
 ## 📄 **License**
 
