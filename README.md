@@ -1,4 +1,4 @@
-# weather-cli-16bit v0.3.23 🌤️
+# weather-cli-16bit v0.3.24 🌤️
 
 [![npm version](https://badge.fury.io/js/weather-cli-16bit.svg)](https://www.npmjs.com/package/weather-cli-16bit)
 [![GitHub Actions](https://github.com/deephouse23/weather-cli/workflows/NPM%20Publish%20on%20PR%20Merge/badge.svg)](https://github.com/deephouse23/weather-cli/actions)
@@ -13,7 +13,7 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 
 **✨ Now with no quotes needed! Just type `weather San Ramon CA` from anywhere on your system.**
 
-## 🎉 **What's New in v0.3.23** - Comprehensive Testing & Enhanced Display
+## 🎉 **What's New in v0.3.24** - Comprehensive Testing & Enhanced Display
 
 ### 🧪 **Major Testing Infrastructure**
 - **Playwright Integration**: Complete end-to-end testing framework
@@ -370,7 +370,7 @@ weather config
 
 ## 📈 **Performance**
 
-### **v0.3.23 Performance Improvements**
+### **v0.3.24 Performance Improvements**
 - **Enhanced Testing**: Playwright integration for comprehensive validation
 - **Improved Display**: Better formatting and alignment consistency
 - **Optimized Caching**: Smart cache management with 90%+ hit rate
@@ -442,7 +442,7 @@ This project uses GitHub Actions to automatically publish to npm when PRs are me
 
 ## 📝 **Changelog**
 
-### **v0.3.23** (Latest) - Comprehensive Testing & Enhanced Display
+### **v0.3.24** (Latest) - Comprehensive Testing & Enhanced Display
 - 🧪 **TESTING**: Added Playwright testing framework for end-to-end testing
 - 🧪 **TESTING**: Comprehensive test suites for weather CLI validation
 - 🎨 **DISPLAY**: Improved weather display formatting and layout alignment

@@ -34,7 +34,8 @@
       "Bash(gh pr view:*)",
       "Bash(grep:*)",
       "Bash(git stash:*)",
-      "Bash(npm publish:*)"
+      "Bash(npm publish:*)",
+      "Bash(gh pr create:*)"
     ],
     "deny": []
   },
