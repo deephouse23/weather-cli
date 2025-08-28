@@ -27,9 +27,9 @@ const __dirname = dirname(__filename);
 const packageJson = JSON.parse(readFileSync(join(__dirname, 'package.json'), 'utf8'));
 const VERSION = packageJson.version;
 
-// Beta banner function
+// Beta banner function - now opt-in only
 function showBetaBanner() {
-  if (process.argv.includes('--no-beta-banner') || program.opts().noBetaBanner) return;
+  if (!process.argv.includes('--beta-banner') && !program.opts().betaBanner) return;
   
   console.log(chalk.yellow.bold(`
 ╔══════════════════════════════════════╗
@@ -167,7 +167,7 @@ program
   .name('weather')
   .description('A beautiful CLI weather application')
   .version(VERSION)
-  .option('--no-beta-banner', 'Hide the beta software banner')
+  .option('--beta-banner', 'Show the beta software banner')
 
 program
   .command('now [location]')
@@ -378,7 +378,7 @@ async function main() {
     // Handle default case - if arguments exist but don't match commands, treat as location
     const args = process.argv.slice(2);
     const knownCommands = ['now', 'forecast', '5day', 'compare', 'coords', 'config', 'auth', 'cache', 'interactive', 'i', 'help', '--help', '-h', '--version', '-V'];
-    const knownOptions = ['--no-beta-banner', '-u', '--units', '-f', '--forecast', '-a', '--alerts', '--celsius', '--fahrenheit'];
+    const knownOptions = ['--beta-banner', '-u', '--units', '-f', '--forecast', '-a', '--alerts', '--celsius', '--fahrenheit'];
 
     if (args.length === 0) {
       // No arguments, start interactive mode
@@ -386,9 +386,7 @@ async function main() {
       await interactiveMode();
     } else if (args.length > 0 && !knownCommands.includes(args[0])) {
       // First argument is not a known command, treat as location for current weather
-      if (!args.includes('--no-beta-banner')) {
-        showBetaBanner();
-      }
+      showBetaBanner();
       
       // Use parseLocation to intelligently parse the location
       const location = parseLocation(args);

@@ -41,9 +41,9 @@ function formatTime(timestamp) {
 // Convert wind speed based on units
 function formatWindSpeed(speed, displayUnit) {
   if (displayUnit === 'fahrenheit') {
-    // Convert m/s to mph
-    const mph = speed * 2.237;
-    return `${mph.toFixed(1)} mph`;
+    // Convert m/s to m/h
+    const mh = speed * 2.237;
+    return `${mh.toFixed(1)} m/h`;
   }
   return `${speed} m/s`;
 }
@@ -122,7 +122,7 @@ function getTerminalWidth() {
   return process.stdout.columns || 80;
 }
 
-// Display current weather in horizontal layout
+// Display current weather in compact horizontal layout
 function displayCurrentWeather(data, displayUnit) {
   // Check if data has current property or is the weather data directly
   const weather = data.current || data;
@@ -136,115 +136,72 @@ function displayCurrentWeather(data, displayUnit) {
   const emoji = weatherEmojis[weather.weather[0].main] || '🌤️';
   const terminalWidth = getTerminalWidth();
   
-  // Location header
-  const locationHeader = `${emoji} ${chalk.cyan.bold(weather.name)}, ${chalk.yellow.bold(weather.sys.country)}`;
+  // Add timestamp
+  const timestamp = new Date().toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
   
-  // Create main weather display
-  const separator = chalk.gray('─'.repeat(60));
+  // Compact location header with timestamp
+  const locationHeader = `${emoji} ${chalk.cyan.bold(weather.name)}, ${chalk.yellow.bold(weather.sys.country)} ${chalk.gray(`• ${timestamp}`)}`;
   
-  // Temperature section
+  // Compact separator - shorter
+  const separator = chalk.gray('─'.repeat(40));
+  
+  // More compact sections with tighter spacing
   const tempSection = [
-    chalk.bold('🌡️  Temperature'),
-    createDataRow('Current:', formatTemp(weather.main.temp, displayUnit, { colorCode: true, type: 'current' }), { labelWidth: 15 }),
-    createDataRow('Feels like:', formatTemp(weather.main.feels_like, displayUnit), { labelWidth: 15 }),
-    createDataRow('Min:', formatTemp(weather.main.temp_min, displayUnit, { colorCode: true, type: 'min' }), { labelWidth: 15 }),
-    createDataRow('Max:', formatTemp(weather.main.temp_max, displayUnit, { colorCode: true, type: 'max' }), { labelWidth: 15 })
+    createDataRow('Temp:', `${formatTemp(weather.main.temp, displayUnit, { colorCode: true, type: 'current' })} (feels ${formatTemp(weather.main.feels_like, displayUnit)})`, { labelWidth: 8 }),
+    createDataRow('Range:', `${formatTemp(weather.main.temp_min, displayUnit, { colorCode: true, type: 'min' })} - ${formatTemp(weather.main.temp_max, displayUnit, { colorCode: true, type: 'max' })}`, { labelWidth: 8 })
   ].join('\n');
   
-  // Conditions section
   const conditionsSection = [
-    chalk.bold('🌤️  Conditions'),
-    createDataRow('Weather:', weather.weather[0].description, { labelWidth: 15 }),
-    createDataRow('Humidity:', `${weather.main.humidity}%`, { labelWidth: 15 }),
-    createDataRow('Pressure:', `${weather.main.pressure} hPa`, { labelWidth: 15 }),
-    createDataRow('Visibility:', `${(weather.visibility / 1000).toFixed(1)} km`, { labelWidth: 15 })
+    createDataRow('Weather:', weather.weather[0].description, { labelWidth: 8 }),
+    createDataRow('Humidity:', `${weather.main.humidity}% • ${weather.main.pressure}hPa • ${(weather.visibility / 1000).toFixed(1)}km`, { labelWidth: 8 })
   ].join('\n');
   
-  // Wind section
   const windSection = [
-    chalk.bold('💨 Wind'),
-    createDataRow('Speed:', formatWindSpeed(weather.wind.speed, displayUnit), { labelWidth: 15 }),
-    createDataRow('Direction:', `${weather.wind.deg}°`, { labelWidth: 15 }),
-    weather.wind.gust ? createDataRow('Gust:', formatWindSpeed(weather.wind.gust, displayUnit), { labelWidth: 15 }) : ''
-  ].filter(Boolean).join('\n');
-  
-  // Sun times
-  const sunSection = [
-    chalk.bold('🌅 Sun'),
-    createDataRow('Sunrise:', formatTime(weather.sys.sunrise), { labelWidth: 15 }),
-    createDataRow('Sunset:', formatTime(weather.sys.sunset), { labelWidth: 15 })
+    createDataRow('Wind:', `${formatWindSpeed(weather.wind.speed, displayUnit)} ${weather.wind.deg}°${weather.wind.gust ? ` (gust ${formatWindSpeed(weather.wind.gust, displayUnit)})` : ''}`, { labelWidth: 8 })
   ].join('\n');
   
-  // Air quality section
+  const sunSection = [
+    createDataRow('Sun:', `${formatTime(weather.sys.sunrise)} - ${formatTime(weather.sys.sunset)}`, { labelWidth: 8 })
+  ].join('\n');
+  
+  // Air quality section - more compact
   const aqi = data.pollution?.list?.[0]?.main?.aqi;
   const airQualitySection = aqi ? [
-    chalk.bold('⚠️  Air Quality'),
-    createDataRow('AQI:', `${aqi}`, { labelWidth: 15 }),
-    createDataRow('Status:', getAirQualityDescription(aqi), { labelWidth: 15 })
+    createDataRow('Air:', `${getAirQualityDescription(aqi)} (AQI: ${aqi})`, { labelWidth: 8 })
   ].join('\n') : '';
   
-  // Create two-column layout for wider terminals
-  let content;
-  if (terminalWidth >= 100) {
-    // Two-column layout
-    const leftColumn = [tempSection, '', windSection].join('\n');
-    const rightColumn = [conditionsSection, '', sunSection, airQualitySection ? '\n' + airQualitySection : ''].join('\n');
-    
-    const leftLines = leftColumn.split('\n');
-    const rightLines = rightColumn.split('\n');
-    const maxLines = Math.max(leftLines.length, rightLines.length);
-    
-    const twoColumnContent = [];
-    for (let i = 0; i < maxLines; i++) {
-      const left = leftLines[i] || '';
-      const right = rightLines[i] || '';
-      twoColumnContent.push(`${left.padEnd(45)}${right}`);
-    }
-    
-    content = [
-      locationHeader,
-      weather.weather[0].description,
-      separator,
-      twoColumnContent.join('\n')
-    ].join('\n');
-  } else {
-    // Single column layout for narrow terminals
-    content = [
-      locationHeader,
-      weather.weather[0].description,
-      separator,
-      tempSection,
-      separator,
-      conditionsSection,
-      separator,
-      windSection,
-      separator,
-      sunSection,
-      airQualitySection ? separator + '\n' + airQualitySection : ''
-    ].filter(Boolean).join('\n');
-  }
+  // Always use single column for more compact display
+  const content = [
+    locationHeader,
+    separator,
+    tempSection,
+    conditionsSection,
+    windSection,
+    sunSection,
+    airQualitySection
+  ].filter(Boolean).join('\n');
   
-  // Create the box with title
+  // More compact box with smaller padding
   console.log(boxen(
     content,
     {
-      title: '🌍 Current Weather',
-      titleAlignment: 'center',
-      padding: 1,
-      margin: 1,
+      padding: { top: 0, bottom: 0, left: 1, right: 1 },
+      margin: 0,
       borderStyle: 'round',
       borderColor: 'cyan',
-      width: Math.min(terminalWidth - 2, 120)
+      width: Math.min(terminalWidth - 2, 80)
     }
   ));
 }
 
-// Display 5-day forecast
+// Display compact 5-day forecast
 function display5DayForecast(data, displayUnit) {
-  console.log(chalk.cyan.bold('\n📅 5-Day Forecast:'));
-  
   const dailyData = {};
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const today = new Date().getDay();
   
   data.forecast.list.forEach(item => {
@@ -271,7 +228,6 @@ function display5DayForecast(data, displayUnit) {
   const forecastLines = Object.entries(dailyData).slice(0, 5).map(([_, info]) => {
     const minTemp = Math.min(...info.temps);
     const maxTemp = Math.max(...info.temps);
-    const avgTemp = info.temps.reduce((a, b) => a + b, 0) / info.temps.length;
     
     // Get most common weather
     const weatherCount = {};
@@ -282,24 +238,16 @@ function display5DayForecast(data, displayUnit) {
       .sort(([,a], [,b]) => b - a)[0][0];
     const emoji = weatherEmojis[mostCommonWeather] || '🌤️';
     
-    const dayLabel = info.isToday ? chalk.yellow(`${info.dayName} (Today)`) : info.dayName;
-    const temps = `Min: ${formatTemp(minTemp, displayUnit, { colorCode: true, type: 'min' })} | ` +
-                 `Max: ${formatTemp(maxTemp, displayUnit, { colorCode: true, type: 'max' })} | ` +
-                 `Avg: ${formatTemp(avgTemp, displayUnit)}`;
+    const dayLabel = info.isToday ? chalk.yellow(`${info.dayName}`) : info.dayName;
+    const temps = `${formatTemp(minTemp, displayUnit, { colorCode: true, type: 'min' })}/${formatTemp(maxTemp, displayUnit, { colorCode: true, type: 'max' })}`;
     
-    return createDataRow(
-      `${emoji} ${dayLabel}:`,
-      temps,
-      { labelWidth: 25, valueWidth: 50 }
-    );
+    return `${emoji} ${dayLabel.padEnd(4)} ${temps}`;
   });
   
   console.log(boxen(
     forecastLines.join('\n'),
     {
-      title: '📊 Temperature Trends',
-      titleAlignment: 'center',
-      padding: 1,
+      padding: { top: 0, bottom: 0, left: 1, right: 1 },
       margin: 0,
       borderStyle: 'round',
       borderColor: 'green'
@@ -307,63 +255,25 @@ function display5DayForecast(data, displayUnit) {
   ));
 }
 
-// Display 24-hour forecast in grid layout
+// Display compact 24-hour forecast
 function display24HourForecast(data, displayUnit) {
-  console.log(chalk.cyan.bold('\n⏰ 24-Hour Forecast:'));
-  
   const next24Hours = data.forecast.list.slice(0, 8); // 3-hour intervals
-  const itemsPerRow = 4;
-  const rows = [];
   
-  for (let i = 0; i < next24Hours.length; i += itemsPerRow) {
-    const rowItems = next24Hours.slice(i, i + itemsPerRow);
-    const row = rowItems.map(item => {
-      const time = new Date(item.dt * 1000).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        hour12: true
-      });
-      const emoji = weatherEmojis[item.weather[0].main] || '🌤️';
-      const temp = formatTemp(item.main.temp, displayUnit);
-      const desc = item.weather[0].description;
-      
-      // Format as a compact box
-      return [
-        chalk.bold(time),
-        `${emoji} ${temp}`,
-        chalk.gray(desc.substring(0, 12))
-      ].join('\n');
+  const forecastLines = next24Hours.map(item => {
+    const time = new Date(item.dt * 1000).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      hour12: true
     });
+    const emoji = weatherEmojis[item.weather[0].main] || '🌤️';
+    const temp = formatTemp(item.main.temp, displayUnit);
     
-    rows.push(row);
-  }
-  
-  // Create grid layout
-  const gridContent = rows.map(row => {
-    const cells = row.map(cell => {
-      const lines = cell.split('\n');
-      return lines.map(line => line.padEnd(18)).join('\n');
-    });
-    
-    // Combine cells horizontally
-    const maxLines = 3;
-    const combinedLines = [];
-    for (let i = 0; i < maxLines; i++) {
-      const lineContent = cells.map(cell => {
-        const cellLines = cell.split('\n');
-        return cellLines[i] || ''.padEnd(18);
-      }).join(' │ ');
-      combinedLines.push(lineContent);
-    }
-    
-    return combinedLines.join('\n');
-  }).join('\n' + chalk.gray('─'.repeat(80)) + '\n');
+    return `${time.padEnd(6)} ${emoji} ${temp.padEnd(6)} ${chalk.gray(item.weather[0].description)}`;
+  });
   
   console.log(boxen(
-    gridContent,
+    forecastLines.join('\n'),
     {
-      title: '🕐 Hourly Breakdown',
-      titleAlignment: 'center',
-      padding: 1,
+      padding: { top: 0, bottom: 0, left: 1, right: 1 },
       margin: 0,
       borderStyle: 'round',
       borderColor: 'blue'

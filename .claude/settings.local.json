@@ -28,8 +28,18 @@
       "Bash(npm run test:ci:*)",
       "Bash(timeout:*)",
       "Bash(npm run:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(gh pr edit:*)",
+      "Bash(export COLUMNS=80)",
+      "Bash(gh pr view:*)",
+      "Bash(grep:*)",
+      "Bash(git stash:*)",
+      "Bash(npm publish:*)"
     ],
     "deny": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "filesystem"
+  ]
 }
