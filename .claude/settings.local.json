@@ -3,7 +3,8 @@
   "permissions": {
     "allow": [
       "Bash(git add:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(git pull:*)"
     ],
     "deny": []
   }
