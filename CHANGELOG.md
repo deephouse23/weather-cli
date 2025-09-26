@@ -5,6 +5,63 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.52] - 2025-09-25
+
+### Added
+- Tokyo Night color theme throughout the application
+- Temperature gradient colors based on temperature ranges
+- Weather condition contextual colors
+- Air Quality Index (AQI) color indicators
+- Wind speed color coding based on Beaufort scale
+- Comprehensive theme system in src/theme.js
+- Smart color mapping for weather severity and conditions
+
+### Changed
+- Replaced all direct chalk color calls with themed color functions
+- Updated display.js to use Tokyo Night color palette
+- Enhanced visual accessibility with high contrast colors
+- Improved terminal compatibility for modern environments
+
+### Technical
+- Created modular theme system for easy customization
+- Temperature colors adapt to Celsius/Fahrenheit units
+- Consistent color mapping across all weather displays
+- Updated all output functions to use themed colors
+
+## [0.3.25] - 2025-09-20
+
+### Added
+- Enhanced rate limit messages with retry hints and API tier information
+- Major cities support - 70+ cities work without country/state requirement
+- Debug logging via WEATHER_DEBUG environment variable for network troubleshooting
+
+### Changed
+- Clean documentation with improved user experience
+- Better error messaging and guidance
+
+## [0.3.0] - 2025-09-15
+
+### Added
+- OS Keychain integration for secure API key storage using keytar
+- Input sanitization and injection attack protection
+- Structured error handling with specific error codes
+- Automatic retry logic with exponential backoff for network issues
+- Timeout protection (5-second timeout) to prevent hanging requests
+- Enhanced caching with size limits, age limits, and LRU eviction
+- Comprehensive testing suite including security, performance, and smoke tests
+- New authentication commands: weather auth set and weather auth test
+
+### Changed
+- Eliminated all process.exit() calls from libraries for better reliability
+- API keys never appear in logs or error messages for security
+- Cache failures no longer affect weather lookups
+- Cross-platform verification on macOS, Windows, and Linux
+
+### Security
+- Zero API key exposure in logs or error messages
+- Comprehensive protection against injection attacks
+- Secure credential management with OS keychain integration
+
 ## [0.0.24] - 2025-01-07
 
 ### 🎨 **Added**

@@ -1,7 +1,7 @@
-# weather-cli-16bit v0.3.25
+# weather-cli-16bit v0.3.52
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.3.25-orange)
+![Version](https://img.shields.io/badge/version-0.3.52-orange)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
@@ -12,13 +12,28 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 
 **Now with simplified global installation! Just type `weather "City, State"` from anywhere on your system.**
 
-## **What's New in v0.3.25** - Developer Experience Enhancements
+## **What's New in v0.3.52** - Tokyo Night Visual Refresh
 
-### **Developer Experience Improvements (Latest)**
+### **Tokyo Night Color Theme (Latest)**
+- **Modern Color Palette**: Beautiful Tokyo Night color scheme throughout the application
+- **Temperature Gradients**: Dynamic color coding based on temperature ranges
+- **Weather Condition Colors**: Contextual colors for different weather conditions
+- **Air Quality Index Colors**: Visual indicators for air quality levels
+- **Wind Speed Colors**: Color-coded wind speed indicators based on Beaufort scale
+- **Consistent Theming**: Unified color system across all output displays
+
+### **Visual Enhancements**
+- **Smart Color Mapping**: Colors adapt to weather severity and conditions
+- **Accessibility**: High contrast colors for better readability
+- **Terminal Compatibility**: Optimized for modern terminal environments
+
+## **Previous Updates - v0.3.25** - Developer Experience Enhancements
+
+### **Developer Experience Improvements**
 - **Enhanced Rate Limit Messages**: Clear guidance with retry hints and API tier info
 - **Major Cities Support**: 70+ cities work without country/state requirement
 - **Debug Logging**: WEATHER_DEBUG environment variable for network troubleshooting
-- **Clean Documentation**: Removed emojis, added prominent migration guide
+- **Clean Documentation**: Removed documentation clutter
 
 ## **Previous Updates - v0.3.0** - Security & Reliability Release
 

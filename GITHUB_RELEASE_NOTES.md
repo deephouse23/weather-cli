@@ -1,109 +1,48 @@
-# Weather CLI v0.0.2 - Simplified Global Installation 🌤️
+# weather-cli-16bit v0.3.52 - Tokyo Night Visual Refresh
 
-**Major improvements to installation and usability!**
+Beautiful new Tokyo Night color theme brings modern, consistent visual design to your weather CLI experience.
 
-## ✨ What's New
+## Tokyo Night Color Theme
 
-### Simplified Commands
-No more typing `weather now london` - just use `weather london`!
+Transform your weather display with the popular Tokyo Night color palette:
+- **Temperature Gradients**: Dynamic color coding from cold blues to hot reds
+- **Weather Condition Colors**: Contextual colors for rain (cyan), snow (blue), storms (red), etc.
+- **Air Quality Colors**: Visual indicators from good (green) to very poor (red)
+- **Wind Speed Colors**: Beaufort scale-based color coding for wind conditions
 
-```bash
-# Before ❌
-weather now london
-weather now "new york" --units imperial
+## Visual Enhancements
 
-# Now ✅
-weather london  
-weather "new york" --units imperial
-```
+- **Smart Color Mapping**: Colors adapt intelligently to weather severity and conditions
+- **High Contrast Design**: Improved accessibility with carefully chosen color combinations
+- **Terminal Optimized**: Tested across modern terminal environments for consistent display
+- **Unified Experience**: Consistent theming across all weather displays and outputs
 
-### Global Installation  
-Install once, use anywhere on your system:
+## Technical Improvements
 
-```bash
-git clone https://github.com/deephouse23/weather-cli.git
-cd weather-cli
-npm install && npm install -g .
+- **Modular Theme System**: New `src/theme.js` provides centralized color management
+- **Unit-Aware Colors**: Temperature colors automatically adapt to Celsius/Fahrenheit
+- **Extensible Design**: Easy to customize or extend color themes in the future
 
-# Now available globally!
-weather london
-weather forecast paris
-weather tokyo --forecast
-```
-
-## 🚀 Quick Start
+## Installation
 
 ```bash
-# Clone and install
-git clone https://github.com/deephouse23/weather-cli.git
-cd weather-cli
-npm install && npm install -g .
-
-# Set up API key  
-cp .env.example .env
-# Edit .env with your OpenWeatherMap API key
-
-# Start using immediately!
-weather london
-weather "san francisco" --forecast
-weather
+npm install -g weather-cli-16bit@0.3.52
 ```
 
-## 📋 Full Changelog
+## Usage
 
-### Added
-- ⚡ **Simplified command syntax** - `weather london` works without `now`
-- 🌍 **Global npm installation** - `npm install -g .` for system-wide access
-- 📝 **Enhanced documentation** - Version badges, better README, comprehensive guides
-- 🔧 **Repository metadata** - Homepage, bugs, and repository URLs in package.json
-- 📚 **CHANGELOG.md** - Complete version history documentation
-- 🛠️ **Development guides** - RELEASE_COMMANDS.md and updated CLAUDE.md
-- 📄 **.env.example** - Template for easier API key setup
-
-### Improved
-- 🎯 **Command parsing** - Better argument detection and error handling
-- 📖 **Documentation** - Professional README with installation focus
-- 🔄 **User experience** - Clearer error messages and help text
-- 🏗️ **Package structure** - Added `preferGlobal: true` for better npm experience
-
-### Technical
-- Version bumped to 0.0.2 in both package.json and CLI
-- Enhanced CLI argument parsing for default location commands
-- All existing commands remain 100% backwards compatible
-- Cross-platform execution with proper shebang line
-
-## 🛠️ All Commands
+The visual improvements are automatic - no configuration needed. Just use weather-cli as usual:
 
 ```bash
-# Simplified (NEW!)
-weather london
-weather "new york" --forecast
-weather tokyo --units imperial
-
-# Original commands (still work!)
-weather now london
-weather forecast paris  
-weather 5day berlin
-weather compare london tokyo
-weather coords 40.7128,-74.0060
-weather interactive
-weather config
-weather cache
+weather "London, UK"
+weather forecast "Tokyo, Japan"
+weather compare "Paris, France" "Rome, Italy"
 ```
 
-## ✅ Backwards Compatibility
+## What's Next
 
-**100% compatible** - All your existing commands and scripts continue to work unchanged!
-
-## 🎯 Perfect For
-
-- **Daily weather checks** - `weather london` from anywhere
-- **Global CLI tools** - Install once, use system-wide  
-- **Developers** - Clean, simple API with comprehensive docs
-- **Power users** - All advanced features preserved
+This release focuses on visual design improvements. The Tokyo Night theme provides a solid foundation for future visual enhancements while maintaining the reliable functionality you expect from weather-cli.
 
 ---
 
-**Install globally and start using `weather london` from anywhere on your system! 🎉**
-
-**Get Started:** https://github.com/deephouse23/weather-cli#installation
+**Full Changelog**: [View on GitHub](https://github.com/deephouse23/weather-cli/blob/main/CHANGELOG.md)

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import chalk from 'chalk';
+import { theme } from '../theme.js';
 
 // Enable debug logging via environment variable
 const DEBUG = process.env.WEATHER_DEBUG === 'true' || process.env.DEBUG === 'true';
@@ -33,11 +34,11 @@ axiosRetry(httpClient, {
   },
   onRetry: (retryCount, error, requestConfig) => {
     if (DEBUG) {
-      console.log(chalk.yellow(`[DEBUG] Retry attempt ${retryCount}/${3}`));
-      console.log(chalk.yellow(`  URL: ${requestConfig.url}`));
-      console.log(chalk.yellow(`  Error: ${error.message}`));
-      console.log(chalk.yellow(`  Status: ${error.response?.status || 'Network Error'}`));
-      console.log(chalk.yellow(`  Delay: ${Math.pow(2, retryCount - 1)} seconds`));
+      console.log(theme.warning(`[DEBUG] Retry attempt ${retryCount}/${3}`));
+      console.log(theme.warning(`  URL: ${requestConfig.url}`));
+      console.log(theme.warning(`  Error: ${error.message}`));
+      console.log(theme.warning(`  Status: ${error.response?.status || 'Network Error'}`));
+      console.log(theme.warning(`  Delay: ${Math.pow(2, retryCount - 1)} seconds`));
     }
   }
 });
@@ -45,9 +46,9 @@ axiosRetry(httpClient, {
 // Add request interceptor for debug logging
 if (DEBUG) {
   httpClient.interceptors.request.use((config) => {
-    console.log(chalk.cyan(`[DEBUG] Request: ${config.method?.toUpperCase()} ${config.url}`));
+    console.log(theme.info(`[DEBUG] Request: ${config.method?.toUpperCase()} ${config.url}`));
     if (config.params) {
-      console.log(chalk.cyan(`  Params: ${JSON.stringify(config.params)}`));
+      console.log(theme.info(`  Params: ${JSON.stringify(config.params)}`));
     }
     return config;
   });
@@ -57,17 +58,17 @@ if (DEBUG) {
 httpClient.interceptors.response.use(
   (response) => {
     if (DEBUG) {
-      console.log(chalk.green(`[DEBUG] Response: ${response.status} ${response.statusText}`));
-      console.log(chalk.green(`  URL: ${response.config.url}`));
-      console.log(chalk.green(`  Time: ${response.headers['x-response-time'] || 'N/A'}`));
+      console.log(theme.success(`[DEBUG] Response: ${response.status} ${response.statusText}`));
+      console.log(theme.success(`  URL: ${response.config.url}`));
+      console.log(theme.success(`  Time: ${response.headers['x-response-time'] || 'N/A'}`));
     }
     return response;
   },
   (error) => {
     if (DEBUG && error.response) {
-      console.log(chalk.red(`[DEBUG] Error Response: ${error.response.status}`));
-      console.log(chalk.red(`  URL: ${error.config?.url}`));
-      console.log(chalk.red(`  Message: ${error.message}`));
+      console.log(theme.error(`[DEBUG] Error Response: ${error.response.status}`));
+      console.log(theme.error(`  URL: ${error.config?.url}`));
+      console.log(theme.error(`  Message: ${error.message}`));
     }
 
     if (error.response?.status === 429) {
