@@ -1,7 +1,7 @@
-# Weather CLI v0.3.0
+# weather-cli-16bit v0.3.25
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.3.0-orange)
+![Version](https://img.shields.io/badge/version-0.3.25-orange)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
@@ -12,7 +12,15 @@ A beautiful command-line weather application with **horizontal layout**, **respo
 
 **Now with simplified global installation! Just type `weather "City, State"` from anywhere on your system.**
 
-## **What's New in v0.3.0** - Security & Reliability Release
+## **What's New in v0.3.25** - Developer Experience Enhancements
+
+### **Developer Experience Improvements (Latest)**
+- **Enhanced Rate Limit Messages**: Clear guidance with retry hints and API tier info
+- **Major Cities Support**: 70+ cities work without country/state requirement
+- **Debug Logging**: WEATHER_DEBUG environment variable for network troubleshooting
+- **Clean Documentation**: Removed emojis, added prominent migration guide
+
+## **Previous Updates - v0.3.0** - Security & Reliability Release
 
 ### **Enterprise Security**
 - **OS Keychain Integration**: API keys stored securely using `keytar`

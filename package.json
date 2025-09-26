@@ -1,6 +1,6 @@
 {
-  "name": "weather-cli",
-  "version": "0.3.0",
+  "name": "weather-cli-16bit",
+  "version": "0.3.25",
   "description": "A beautiful CLI weather application with horizontal layout and enhanced features",
   "main": "index.js",
   "type": "module",
