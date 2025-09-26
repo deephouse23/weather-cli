@@ -16,6 +16,7 @@ import { processTemperatureOptions, getDefaultLocation, getDefaultUnits, setDefa
 import { WeatherError, mapErrorToExitCode } from './src/utils/errors.js';
 import { getApiKey, setApiKey, testApiKey } from './src/api/auth.js';
 import { sanitizeLocation } from './src/utils/validators.js';
+import { theme } from './src/theme.js';
 
 // Load environment variables
 dotenv.config();
@@ -30,7 +31,7 @@ const VERSION = packageJson.version;
 function showBetaBanner() {
   if (process.argv.includes('--no-beta-banner') || program.opts().noBetaBanner) return;
   
-  console.log(chalk.yellow.bold(`
+  console.log(theme.warning(`
 ╔══════════════════════════════════════╗
 ║              BETA SOFTWARE           ║
 ║                                      ║
@@ -45,17 +46,17 @@ function showBetaBanner() {
 
 // Compare weather between two cities
 async function compareWeather(city1, city2, userUnits = null) {
-  console.log(chalk.cyan.bold(`\n🌍 Comparing weather: ${city1} vs ${city2}`));
+  console.log(theme.header(`\n🌍 Comparing weather: ${city1} vs ${city2}`));
   
   const [data1, data2] = await Promise.all([
     getWeather(city1, userUnits),
     getWeather(city2, userUnits)
   ]);
   
-  console.log(chalk.green('\n📍 City 1:'));
+  console.log(theme.success('\n📍 City 1:'));
   displayCurrentWeather(data1, data1.displayUnit);
   
-  console.log(chalk.green('\n📍 City 2:'));
+  console.log(theme.success('\n📍 City 2:'));
   displayCurrentWeather(data2, data2.displayUnit);
     
     // Compare temperatures
@@ -63,14 +64,14 @@ async function compareWeather(city1, city2, userUnits = null) {
     const temp2 = data2.current.main.temp;
     const diff = Math.abs(temp1 - temp2);
     
-    console.log(chalk.yellow(`\n🌡️  Temperature difference: ${diff.toFixed(1)}°${data1.displayUnit === 'fahrenheit' ? 'F' : 'C'}`));
+    console.log(theme.warning(`\n🌡️  Temperature difference: ${diff.toFixed(1)}°${data1.displayUnit === 'fahrenheit' ? 'F' : 'C'}`));
     
     if (temp1 > temp2) {
-      console.log(chalk.red(`${city1} is warmer by ${diff.toFixed(1)}°`));
+      console.log(theme.error(`${city1} is warmer by ${diff.toFixed(1)}°`));
     } else if (temp2 > temp1) {
-      console.log(chalk.red(`${city2} is warmer by ${diff.toFixed(1)}°`));
+      console.log(theme.error(`${city2} is warmer by ${diff.toFixed(1)}°`));
     } else {
-      console.log(chalk.green('Both cities have the same temperature!'));
+      console.log(theme.success('Both cities have the same temperature!'));
     }
 }
 
@@ -135,24 +136,24 @@ async function interactiveMode() {
   if (saveDefault.save) {
     await setDefaultLocation(answers.location);
     await setDefaultUnits(answers.units);
-    console.log(chalk.green('✅ Default settings saved!'));
+    console.log(theme.success('✅ Default settings saved!'));
   }
 }
 
 // Error handler wrapper
 function handleError(error) {
   if (error instanceof WeatherError) {
-    console.error(chalk.red(`❌ ${error.message}`));
+    console.error(theme.error(`❌ ${error.message}`));
     
     // Add helpful hints for specific errors
     if (error.code === 'API_KEY_MISSING') {
-      console.log(chalk.yellow('Get your free API key at: https://openweathermap.org/api'));
-      console.log(chalk.yellow('Then run: weather auth set'));
+      console.log(theme.warning('Get your free API key at: https://openweathermap.org/api'));
+      console.log(theme.warning('Then run: weather auth set'));
     } else if (error.code === 'LOCATION_NOT_FOUND') {
-      console.log(chalk.yellow('Examples: "San Ramon, CA" or "London, UK"'));
+      console.log(theme.warning('Examples: "San Ramon, CA" or "London, UK"'));
     }
   } else {
-    console.error(chalk.red(`❌ Unexpected error: ${error.message}`));
+    console.error(theme.error(`❌ Unexpected error: ${error.message}`));
   }
   
   process.exit(mapErrorToExitCode(error));
@@ -174,9 +175,9 @@ program
     if (!location) {
       const defaultLocation = await getDefaultLocation();
       if (!defaultLocation) {
-        console.error(chalk.red('❌ No location provided and no default set'));
-        console.log(chalk.yellow('Usage: weather "City, State" or weather "City, Country"'));
-        console.log(chalk.yellow('Examples: weather "San Ramon, CA" or weather "London, UK"'));
+        console.error(theme.error('❌ No location provided and no default set'));
+        console.log(theme.warning('Usage: weather "City, State" or weather "City, Country"'));
+        console.log(theme.warning('Examples: weather "San Ramon, CA" or weather "London, UK"'));
         throw new WeatherError('No location provided', 'INVALID_INPUT');
       }
       location = defaultLocation;
@@ -188,7 +189,7 @@ program
     const cacheKey = userUnits || 'auto';
     const cached = await getCachedWeather(location, cacheKey);
     if (cached) {
-      console.log(chalk.gray('📦 Using cached data...'));
+      console.log(theme.muted('📦 Using cached data...'));
       displayCurrentWeather(cached, cached.displayUnit);
       return;
     }
@@ -208,7 +209,7 @@ program
     if (!location) {
       const defaultLocation = await getDefaultLocation();
       if (!defaultLocation) {
-        console.error(chalk.red('❌ No location provided and no default set'));
+        console.error(theme.error('❌ No location provided and no default set'));
         throw new WeatherError('No location provided', 'INVALID_INPUT');
       }
       location = defaultLocation;
@@ -230,7 +231,7 @@ program
     if (!location) {
       const defaultLocation = await getDefaultLocation();
       if (!defaultLocation) {
-        console.error(chalk.red('❌ No location provided and no default set'));
+        console.error(theme.error('❌ No location provided and no default set'));
         throw new WeatherError('No location provided', 'INVALID_INPUT');
       }
       location = defaultLocation;
@@ -292,7 +293,7 @@ program
     
     await setDefaultLocation(answers.defaultLocation);
     await setDefaultUnits(answers.defaultUnits);
-    console.log(chalk.green('✅ Configuration saved!'));
+    console.log(theme.success('✅ Configuration saved!'));
   });
 
 const authCommand = program
@@ -314,15 +315,15 @@ authCommand
     ]);
     
     // Test the key
-    console.log(chalk.blue('Testing API key...'));
+    console.log(theme.info('Testing API key...'));
     try {
       await testApiKey(answers.apiKey);
       const saved = await setApiKey(answers.apiKey);
       
       if (saved) {
-        console.log(chalk.green('✅ API key saved to system keychain'));
+        console.log(theme.success('✅ API key saved to system keychain'));
       } else {
-        console.log(chalk.yellow('⚠️  Could not save to keychain, please set WEATHER_API_KEY environment variable'));
+        console.log(theme.warning('⚠️  Could not save to keychain, please set WEATHER_API_KEY environment variable'));
       }
     } catch (error) {
       throw new WeatherError('Invalid API key', 'API_KEY_INVALID');
@@ -334,7 +335,7 @@ authCommand
   .description('Test API key validity')
   .action(async () => {
     await testApiKey();
-    console.log(chalk.green('✅ API key is valid'));
+    console.log(theme.success('✅ API key is valid'));
   });
 
 program
@@ -345,18 +346,18 @@ program
   .action(async (options) => {
     if (options.clear) {
       await clearCache();
-      console.log(chalk.green('✅ Cache cleared!'));
+      console.log(theme.success('✅ Cache cleared!'));
     } else if (options.clean) {
       const cleaned = await cleanExpiredCache();
       if (cleaned === 0) {
-        console.log(chalk.blue('📦 No expired entries to clean'));
+        console.log(theme.info('📦 No expired entries to clean'));
       }
     } else {
       const stats = await getCacheStats();
-      console.log(chalk.blue(`📦 Cache statistics:`));
-      console.log(chalk.white(`  Total entries: ${stats.total}`));
-      console.log(chalk.green(`  Valid entries: ${stats.valid}`));
-      console.log(chalk.yellow(`  Expired entries: ${stats.expired}`));
+      console.log(theme.info(`📦 Cache statistics:`));
+      console.log(theme.text(`  Total entries: ${stats.total}`));
+      console.log(theme.success(`  Valid entries: ${stats.valid}`));
+      console.log(theme.warning(`  Expired entries: ${stats.expired}`));
     }
   });
 
