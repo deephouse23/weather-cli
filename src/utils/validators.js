@@ -3,6 +3,20 @@ import { WeatherError, ERROR_CODES } from './errors.js';
 const UNSAFE_CHARS_REGEX = /[<>'"{}|\\\^`]/g;
 const MAX_LOCATION_LENGTH = 100;
 
+// Major cities that can be searched without country/state
+const MAJOR_CITIES = new Set([
+  'london', 'paris', 'tokyo', 'beijing', 'moscow', 'berlin', 'madrid', 'rome',
+  'amsterdam', 'brussels', 'vienna', 'stockholm', 'oslo', 'copenhagen', 'dublin',
+  'lisbon', 'athens', 'prague', 'budapest', 'warsaw', 'bucharest', 'helsinki',
+  'sydney', 'melbourne', 'auckland', 'singapore', 'bangkok', 'jakarta', 'manila',
+  'delhi', 'mumbai', 'bangalore', 'chennai', 'kolkata', 'hyderabad', 'pune',
+  'cairo', 'lagos', 'johannesburg', 'nairobi', 'casablanca', 'tunis', 'accra',
+  'dubai', 'istanbul', 'jerusalem', 'tehran', 'baghdad', 'riyadh', 'doha',
+  'toronto', 'vancouver', 'montreal', 'ottawa', 'calgary', 'edmonton', 'quebec',
+  'chicago', 'houston', 'phoenix', 'philadelphia', 'dallas', 'austin', 'seattle',
+  'boston', 'atlanta', 'miami', 'denver', 'detroit', 'minneapolis', 'portland'
+]);
+
 export function sanitizeLocation(location) {
   if (typeof location !== 'string') {
     throw new WeatherError('Location must be a string', ERROR_CODES.INVALID_INPUT);
@@ -16,18 +30,24 @@ export function sanitizeLocation(location) {
 
 export function validateLocation(location) {
   const sanitized = sanitizeLocation(location);
-  
+
   if (!sanitized) {
     throw new WeatherError('Location cannot be empty', ERROR_CODES.INVALID_INPUT);
   }
-  
+
+  // Allow major cities to be searched without country/state
   if (!sanitized.includes(',')) {
+    const lowerLocation = sanitized.toLowerCase();
+    if (MAJOR_CITIES.has(lowerLocation)) {
+      return sanitized; // Allow single-word major cities
+    }
+
     throw new WeatherError(
-      'Invalid location format. Please use: "City, State" or "City, Country"',
+      `Location "${sanitized}" not recognized. For smaller cities, please use: "City, State" or "City, Country"`,
       ERROR_CODES.INVALID_INPUT
     );
   }
-  
+
   return sanitized;
 }
 

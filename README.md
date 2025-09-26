@@ -1,4 +1,4 @@
-# Weather CLI v0.3.0 🌤️
+# Weather CLI v0.3.0
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Version](https://img.shields.io/badge/version-0.3.0-orange)
@@ -10,35 +10,74 @@ Part of the 16bitweather suite of weather tools
 
 A beautiful command-line weather application with **horizontal layout**, **responsive design**, and **enhanced features** for any location.
 
-**✨ Now with simplified global installation! Just type `weather "City, State"` from anywhere on your system.**
+**Now with simplified global installation! Just type `weather "City, State"` from anywhere on your system.**
 
-## 🆕 **What's New in v0.3.0** - Security & Reliability Release
+## **What's New in v0.3.0** - Security & Reliability Release
 
-### 🔒 **Enterprise Security**
+### **Enterprise Security**
 - **OS Keychain Integration**: API keys stored securely using `keytar`
 - **Zero Exposure**: API keys never appear in logs or error messages
 - **Input Sanitization**: Comprehensive protection against injection attacks
 - **Secure Commands**: New `weather auth set` and `weather auth test` commands
 
-### ⚡ **Bulletproof Reliability**
+### **Bulletproof Reliability**
 - **No More Crashes**: Eliminated all `process.exit()` calls from libraries
 - **Smart Retry Logic**: Automatic retry with exponential backoff for network issues
 - **Structured Errors**: Specific error codes with actionable recovery suggestions
 - **Timeout Protection**: 5-second timeout prevents hanging requests
 
-### 📦 **Enhanced Caching**
+### **Enhanced Caching**
 - **Size Limits**: Maximum 100 entries prevent unlimited growth
 - **Age Limits**: 7-day maximum age for cache entries
 - **LRU Eviction**: Intelligent removal of least-used entries
 - **Cache Safety**: Failures don't affect weather lookups
 
-### 🧪 **Comprehensive Testing**
+### **Comprehensive Testing**
 - **Security Tests**: Validator and authentication test suites
 - **Performance Tests**: Benchmarks for API calls and cache hits
 - **Smoke Tests**: End-to-end system validation
 - **Cross-Platform**: Verified on macOS, Windows, Linux
 
-## 🚀 **Quick Start**
+## **IMPORTANT: Migration from v0.0.x to v0.3.0**
+
+### **Breaking Changes**
+1. **Location Format**: Now requires "City, State" or "City, Country" format
+   - Old: `weather london`
+   - New: `weather "London, UK"`
+   - Exception: Major cities work without country (London, Paris, Tokyo, etc.)
+
+2. **API Key Storage**: Migrated to secure OS keychain
+   - Run `weather auth set` to securely store your API key
+   - Fallback to `.env` file still supported
+
+3. **Exit Codes**: Changed for better error handling
+   - Code 2: API key issues
+   - Code 3: Location not found
+   - Code 4: Network errors
+   - Code 5: Rate limiting
+   - Code 6: Invalid input
+
+### **Migration Steps**
+```bash
+# 1. Update to v0.3.0
+npm update -g weather-cli
+
+# 2. Store API key securely
+weather auth set
+
+# 3. Test your setup
+weather auth test
+
+# 4. Update any scripts to use new location format
+# Example: weather "San Francisco, CA" instead of weather sf
+```
+
+### **New Features Available**
+- **Debug Mode**: Set `WEATHER_DEBUG=true` for network troubleshooting
+- **Major Cities**: Can use single word for 70+ major cities worldwide
+- **Rate Limit Info**: Clear guidance when hitting API limits
+
+## **Quick Start**
 
 ### **Installation**
 ```bash
@@ -67,32 +106,41 @@ cp .env.example .env
 
 ### **Usage**
 ```bash
-# Basic weather lookup (NEW FORMAT REQUIRED)
-weather "New York, US"
-weather "London, UK"
-weather "Tokyo, JP"
+# Basic weather lookup
+weather "New York, US"     # Full format for any city
+weather "London, UK"       # Country code format
+weather London            # Major cities work without country!
+weather Tokyo             # 70+ major cities supported
+weather Paris             # Simple and convenient
+
+# Debug mode for troubleshooting
+WEATHER_DEBUG=true weather London
 
 # Cache management
 weather cache
 weather cache --clean
 
+# Authentication
+weather auth set          # Store API key securely
+weather auth test         # Verify API key works
+
 # Help system
 weather --help
 ```
 
-## 🎨 **New Horizontal Layout**
+## **New Horizontal Layout**
 
 ### **Large Terminal Display**
 ```
 ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │                                                                                                                      │
-│   ☀️  San Ramon, US                                    🌅 Sunrise: 06:16 AM                                           │
-│   clear sky                                           🌇 Sunset: 08:10 PM                                            │
-│   🌡️  82°F                                           ⚠️  Air Quality: Good (AQI: 1)                                  │
-│   💭 Feels like: 82°F                                 🌡️  Min: 73°F                                                  │
-│   💧 Humidity: 44%                                    🌡️  Max: 88°F                                                  │
-│   📊 Pressure: 1015 hPa                               🧭 Wind Dir: 247°                                              │
-│   💨 Wind: 5.99 mph                                   👁️  Visibility: 10km                                           │
+│   San Ramon, US                                       Sunrise: 06:16 AM                                             │
+│   clear sky                                           Sunset: 08:10 PM                                              │
+│   82°F                                                Air Quality: Good (AQI: 1)                                    │
+│   Feels like: 82°F                                    Min: 73°F                                                     │
+│   Humidity: 44%                                       Max: 88°F                                                     │
+│   Pressure: 1015 hPa                                  Wind Dir: 247°                                                │
+│   Wind: 5.99 mph                                      Visibility: 10km                                              │
 │                                                                                                                      │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
@@ -102,9 +150,9 @@ weather --help
 - **Medium terminals** (80-120 chars): Medium layout with basic sections
 - **Small terminals** (<80 chars): Compact layout with combined info
 
-## 📋 **Required Format**
+## **Required Format**
 
-### **✅ Correct Usage**
+### **Correct Usage**
 ```bash
 weather "San Ramon, US"      # City, Country
 weather "New York, US"       # City, Country  
@@ -113,35 +161,35 @@ weather "Tokyo, JP"          # City, Country
 weather "Paris, FR"          # City, Country
 ```
 
-### **❌ Invalid Usage**
+### **Invalid Usage**
 ```bash
 weather "San Ramon"          # Missing state/country
 weather "New York"           # Missing state/country
 weather "London"             # Missing state/country
 ```
 
-## 🛠️ **Features**
+## **Features**
 
-### **🌤️ Weather Information**
+### **Weather Information**
 - **Current weather** with detailed conditions
 - **Temperature** with feels-like and min/max
 - **Humidity, pressure, and wind** data
 - **Sunrise and sunset** times
 - **Air quality** with AQI ratings
 
-### **🎨 Enhanced Display**
+### **Enhanced Display**
 - **Horizontal layout** that fits your terminal
 - **Responsive design** for any screen size
 - **Color-coded information** with emojis
 - **Prominent location display** with city/state highlighting
 
-### **📦 Smart Caching**
+### **Smart Caching**
 - **30-minute cache expiration** for fresh data
 - **Cache statistics** and cleanup tools
 - **Automatic cache management** with expiration
 - **Cache hit performance** optimization
 
-### **🔒 Enterprise Security**
+### **Enterprise Security**
 - **OS Keychain Storage**: API keys stored securely in system keychain
 - **Input Sanitization**: Protection against injection attacks
 - **Zero Exposure**: API keys never appear in logs or error messages
@@ -149,7 +197,7 @@ weather "London"             # Missing state/country
 - **Fallback Support**: Graceful fallback to environment variables
 - **Cross-Platform**: Works on macOS, Windows, and Linux
 
-## 🏗️ **Architecture**
+## **Architecture**
 
 ### **Modular Structure**
 ```
@@ -166,7 +214,7 @@ src/
 - **Responsive design** that adapts to terminal size
 - **Enhanced user experience** with clear requirements
 
-## 📊 **Installation Options**
+## **Installation Options**
 
 ### **Global Installation (Recommended)**
 ```bash
@@ -184,7 +232,7 @@ cp .env.example .env
 node index.js "New York, US"
 ```
 
-## 🔧 **Configuration**
+## **Configuration**
 
 ### **API Key Setup**
 
@@ -222,7 +270,7 @@ weather auth set
 weather auth test
 ```
 
-## 🧪 **Testing**
+## **Testing**
 
 ### **Security & Validation Tests**
 ```bash
@@ -245,7 +293,7 @@ node test-performance.js
 node test-responsive.js
 ```
 
-## 📈 **Performance**
+## **Performance**
 
 ### **v0.3.0 Performance Improvements**
 - **90%+ Cache Hit Rate**: Intelligent caching reduces API calls by 70%
@@ -255,7 +303,7 @@ node test-responsive.js
 - **Smart Retry Logic**: Automatic recovery from network issues
 - **LRU Cache Eviction**: Prevents unlimited memory growth
 
-## 🎯 **Use Cases**
+## **Use Cases**
 
 ### **Daily Weather Check**
 ```bash
@@ -277,7 +325,7 @@ weather cache          # Check cache status
 weather cache --clean  # Clean expired entries
 ```
 
-## 🚀 **Development**
+## **Development**
 
 ### **Prerequisites**
 - Node.js (v14 or higher)
@@ -301,7 +349,7 @@ cp .env.example .env
 node index.js "New York, US"
 ```
 
-## 🤝 **Contributing**
+## **Contributing**
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
@@ -314,37 +362,37 @@ cp .env.example .env
 # Add your API key to .env
 ```
 
-## 📝 **Changelog**
+## **Changelog**
 
 ### **v0.3.0** (Latest) - Security & Reliability Release
-- 🔒 **SECURITY**: OS keychain integration with `keytar` for secure API key storage
-- 🔒 **SECURITY**: Comprehensive input sanitization and validation
-- 🔒 **SECURITY**: New `weather auth set` and `weather auth test` commands
-- ⚡ **RELIABILITY**: Eliminated all `process.exit()` calls, proper error propagation
-- ⚡ **RELIABILITY**: HTTP client with 5-second timeout and exponential backoff
-- 📦 **CACHING**: Size limits (100 entries), age limits (7 days), LRU eviction
-- 🧪 **TESTING**: Comprehensive test suites for security, performance, and functionality
-- 📚 **DOCS**: Complete security summary and migration guide
+- **SECURITY**: OS keychain integration with `keytar` for secure API key storage
+- **SECURITY**: Comprehensive input sanitization and validation
+- **SECURITY**: New `weather auth set` and `weather auth test` commands
+- **RELIABILITY**: Eliminated all `process.exit()` calls, proper error propagation
+- **RELIABILITY**: HTTP client with 5-second timeout and exponential backoff
+- **CACHING**: Size limits (100 entries), age limits (7 days), LRU eviction
+- **TESTING**: Comprehensive test suites for security, performance, and functionality
+- **DOCS**: Complete security summary and migration guide
 
 ### **v0.0.24** - Horizontal Layout & Modular Architecture
-- ✨ **NEW**: Horizontal layout with responsive design
-- ✨ **NEW**: City, State format requirement
-- ✨ **NEW**: Modular architecture (4 focused modules)
-- ✨ **NEW**: Enhanced caching with expiration
+- **NEW**: Horizontal layout with responsive design
+- **NEW**: City, State format requirement
+- **NEW**: Modular architecture (4 focused modules)
+- **NEW**: Enhanced caching with expiration
 
 ### **Previous Versions**
 - v0.0.23: Security improvements
 - v0.0.22: Initial beta release
 
-## 📄 **License**
+## **License**
 
 MIT License - see [LICENSE](LICENSE) file for details. Created by 16bitweather.
 
-## 👨‍💻 **Author**
+## **Author**
 
 16bitweather
 
-## 🌐 **Links**
+## **Links**
 
 - **Homepage**: [16bitweather.co](https://16bitweather.co)
 - **Repository**: [GitHub](https://github.com/deephouse23/weather-cli)
@@ -353,4 +401,4 @@ MIT License - see [LICENSE](LICENSE) file for details. Created by 16bitweather.
 
 ---
 
-**Part of the 16bitweather suite of weather tools** 🌤️
+**Part of the 16bitweather suite of weather tools**

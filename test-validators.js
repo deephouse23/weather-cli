@@ -20,10 +20,13 @@ try {
 console.log(chalk.blue('Testing location validation:'));
 try {
   console.log('Valid: "New York, NY"', '→', validateLocation('New York, NY'));
+  console.log('Valid major city: "London"', '→', validateLocation('London'));
+  console.log('Valid major city: "Tokyo"', '→', validateLocation('Tokyo'));
+  console.log('Valid major city: "Paris"', '→', validateLocation('Paris'));
   try {
-    validateLocation('InvalidLocation');
+    validateLocation('SmallTown');
   } catch (e) {
-    console.log('Invalid: "InvalidLocation"', '→', chalk.red(e.message));
+    console.log('Invalid small city: "SmallTown"', '→', chalk.red(e.message));
   }
   console.log(chalk.green('✅ Location validation tests passed\n'));
 } catch (error) {
