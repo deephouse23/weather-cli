@@ -86,7 +86,6 @@
       "**/test/**/*.spec.js"
     ],
     "transform": {},
-    "extensionsToTreatAsEsm": [".js"],
     "globals": {
       "__ESM__": true
     },

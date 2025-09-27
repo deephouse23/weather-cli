@@ -75,15 +75,18 @@ function displayCurrentWeather(data, displayUnit) {
   
   // Responsive design based on terminal width
   let layout;
-  if (terminalWidth < 80) {
+  if (terminalWidth < 60) {
+    // Ultra compact layout for very small terminals
+    layout = createUltraCompactLayout(weather, data, displayUnit);
+  } else if (terminalWidth < 80) {
     // Compact layout for small terminals
-    layout = createCompactLayout(weather, data, displayUnit, emoji);
+    layout = createCompactLayout(weather, data, displayUnit);
   } else if (terminalWidth < 120) {
     // Medium layout
-    layout = createMediumLayout(weather, data, displayUnit, emoji);
+    layout = createMediumLayout(weather, data, displayUnit);
   } else {
     // Full horizontal layout
-    layout = createFullLayout(weather, data, displayUnit, emoji);
+    layout = createFullLayout(weather, data, displayUnit);
   }
   
   // Create the box with Tokyo Night styling
@@ -99,8 +102,24 @@ function displayCurrentWeather(data, displayUnit) {
   ));
 }
 
+// Ultra compact layout for very small terminals
+function createUltraCompactLayout(weather, data, displayUnit) {
+  const conditionColor = getWeatherConditionColor(weather.weather[0].description);
+
+  return [
+    theme.location(weather.name),
+    '',
+    formatTemp(weather.main.temp, displayUnit),
+    conditionColor(weather.weather[0].description),
+    '',
+    `Feels like: ${formatTemp(weather.main.feels_like, displayUnit)}`,
+    `Humidity: ${theme.humidity(weather.main.humidity + '%')}`,
+    `Wind: ${weather.wind.speed} ${displayUnit === 'fahrenheit' ? 'mph' : 'm/s'}`
+  ].join('\n');
+}
+
 // Compact layout for small terminals with Tokyo Night colors
-function createCompactLayout(weather, data, displayUnit, emoji) {
+function createCompactLayout(weather, data, displayUnit) {
   const { sunrise, sunset } = weather.sys;
   const aqi = data.pollution?.list?.[0]?.main?.aqi;
   const airQualityDesc = aqi ? getAirQualityDescription(aqi) : 'N/A';
@@ -127,7 +146,7 @@ function createCompactLayout(weather, data, displayUnit, emoji) {
 }
 
 // Medium layout with Tokyo Night colors
-function createMediumLayout(weather, data, displayUnit, emoji) {
+function createMediumLayout(weather, data, displayUnit) {
   const { sunrise, sunset } = weather.sys;
   const aqi = data.pollution?.list?.[0]?.main?.aqi;
   const airQualityDesc = aqi ? getAirQualityDescription(aqi) : 'N/A';
