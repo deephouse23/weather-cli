@@ -135,11 +135,38 @@ function createFormattedLayout(weather, data, displayUnit) {
   const feelsLikeColor = getTempColorValue(weather.main.feels_like);
   const tempLine = `${tempColor.bold(Math.round(weather.main.temp) + unit)} ${dimColor('(Feels like:')} ${feelsLikeColor(Math.round(weather.main.feels_like) + unit)}${dimColor(')')}`;
 
+  // Calculate daily min/max from forecast data (today's actual low/high)
+  const today = new Date().toDateString();
+  const todayForecasts = data.forecast?.list?.filter(item => {
+    const forecastDate = new Date(item.dt * 1000).toDateString();
+    return forecastDate === today;
+  }) || [];
+
+  let dailyMin, dailyMax;
+  if (todayForecasts.length > 0) {
+    // Get the actual min/max from all today's forecast entries
+    const allTemps = todayForecasts.flatMap(f => [f.main.temp, f.main.temp_min, f.main.temp_max]);
+    dailyMin = Math.min(...allTemps, weather.main.temp); // Include current temp
+    dailyMax = Math.max(...allTemps, weather.main.temp); // Include current temp
+  } else {
+    // Fallback: use first day of forecast if today's data not available
+    const firstDayForecasts = data.forecast?.list?.slice(0, 8) || []; // First 8 entries (24 hours)
+    if (firstDayForecasts.length > 0) {
+      const allTemps = firstDayForecasts.flatMap(f => [f.main.temp, f.main.temp_min, f.main.temp_max]);
+      dailyMin = Math.min(...allTemps, weather.main.temp);
+      dailyMax = Math.max(...allTemps, weather.main.temp);
+    } else {
+      // Final fallback to current weather min/max
+      dailyMin = weather.main.temp_min;
+      dailyMax = weather.main.temp_max;
+    }
+  }
+
   // Time & Environmental Grid (2-column aligned) with colors
   const sunriseStr = timeColor(formatTime(sunrise));
   const sunsetStr = timeColor(formatTime(sunset));
-  const minTempStr = getTempColorValue(weather.main.temp_min)(`${Math.round(weather.main.temp_min)}${unit}`);
-  const maxTempStr = getTempColorValue(weather.main.temp_max)(`${Math.round(weather.main.temp_max)}${unit}`);
+  const minTempStr = getTempColorValue(dailyMin)(`${Math.round(dailyMin)}${unit}`);
+  const maxTempStr = getTempColorValue(dailyMax)(`${Math.round(dailyMax)}${unit}`);
   const aqiColoredDesc = getAQIColorValue(aqi)(airQualityDesc);
   const aqiIndexStr = aqi ? getAQIColorValue(aqi)(aqi.toString()) : dimColor('3');
 
