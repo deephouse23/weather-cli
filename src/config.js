@@ -34,6 +34,19 @@ async function getDefaultUnits() {
   return config.defaultUnits || 'auto';
 }
 
+// Check if beta banner should be shown
+async function shouldShowBetaBanner() {
+  const config = await loadConfig();
+  return config.showBetaBanner === true;
+}
+
+// Toggle beta banner setting
+async function setShowBetaBanner(show) {
+  const config = await loadConfig();
+  config.showBetaBanner = show;
+  await saveConfig(config);
+}
+
 // Set default location
 async function setDefaultLocation(location) {
   const config = await loadConfig();
@@ -65,5 +78,7 @@ export {
   getDefaultUnits,
   setDefaultLocation,
   setDefaultUnits,
-  processTemperatureOptions
+  processTemperatureOptions,
+  shouldShowBetaBanner,
+  setShowBetaBanner
 };

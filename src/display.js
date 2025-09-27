@@ -2,18 +2,7 @@ import chalk from 'chalk';
 import boxen from 'boxen';
 import { theme, getTemperatureColor, getWeatherConditionColor, getAQIColor, getWindColor, boxTheme } from './theme.js';
 
-// Weather emoji mapping
-const weatherEmojis = {
-  Clear: '☀️',
-  Clouds: '☁️',
-  Rain: '🌧️',
-  Drizzle: '🌦️',
-  Thunderstorm: '⛈️',
-  Snow: '❄️',
-  Mist: '🌫️',
-  Fog: '🌫️',
-  Haze: '🌫️'
-};
+// Weather emoji mapping (removed - no longer using emojis)
 
 // Format temperature with Tokyo Night colors
 function formatTemp(temp, displayUnit) {
@@ -51,14 +40,14 @@ function displayAlerts(data) {
   const description = getAirQualityDescription(aqi);
   const aqiColor = getAQIColor(aqi);
 
-  console.log(aqiColor(`\n⚠️  Air Quality: ${description} (AQI: ${aqi})`));
+  console.log(aqiColor(`\nAir Quality: ${description} (AQI: ${aqi})`));
 }
 
 // Display sun times with Tokyo Night colors
 function displaySunTimes(data) {
   const { sunrise, sunset } = data.current.sys;
-  console.log(theme.sunrise(`\n🌅 Sunrise: ${formatTime(sunrise)}`));
-  console.log(theme.sunset(`🌇 Sunset: ${formatTime(sunset)}`));
+  console.log(theme.sunrise(`\nSunrise: ${formatTime(sunrise)}`));
+  console.log(theme.sunset(`Sunset: ${formatTime(sunset)}`));
 }
 
 // Display ASCII art
@@ -82,20 +71,22 @@ function getTerminalWidth() {
 // Display current weather in horizontal layout
 function displayCurrentWeather(data, displayUnit) {
   const weather = data.current;
-  const emoji = weatherEmojis[weather.weather[0].main] || '🌤️';
   const terminalWidth = getTerminalWidth();
   
   // Responsive design based on terminal width
   let layout;
-  if (terminalWidth < 80) {
+  if (terminalWidth < 60) {
+    // Ultra compact layout for very small terminals
+    layout = createUltraCompactLayout(weather, data, displayUnit);
+  } else if (terminalWidth < 80) {
     // Compact layout for small terminals
-    layout = createCompactLayout(weather, data, displayUnit, emoji);
+    layout = createCompactLayout(weather, data, displayUnit);
   } else if (terminalWidth < 120) {
     // Medium layout
-    layout = createMediumLayout(weather, data, displayUnit, emoji);
+    layout = createMediumLayout(weather, data, displayUnit);
   } else {
     // Full horizontal layout
-    layout = createFullLayout(weather, data, displayUnit, emoji);
+    layout = createFullLayout(weather, data, displayUnit);
   }
   
   // Create the box with Tokyo Night styling
@@ -111,8 +102,24 @@ function displayCurrentWeather(data, displayUnit) {
   ));
 }
 
+// Ultra compact layout for very small terminals
+function createUltraCompactLayout(weather, data, displayUnit) {
+  const conditionColor = getWeatherConditionColor(weather.weather[0].description);
+
+  return [
+    theme.location(weather.name),
+    '',
+    formatTemp(weather.main.temp, displayUnit),
+    conditionColor(weather.weather[0].description),
+    '',
+    `Feels like: ${formatTemp(weather.main.feels_like, displayUnit)}`,
+    `Humidity: ${theme.humidity(weather.main.humidity + '%')}`,
+    `Wind: ${weather.wind.speed} ${displayUnit === 'fahrenheit' ? 'mph' : 'm/s'}`
+  ].join('\n');
+}
+
 // Compact layout for small terminals with Tokyo Night colors
-function createCompactLayout(weather, data, displayUnit, emoji) {
+function createCompactLayout(weather, data, displayUnit) {
   const { sunrise, sunset } = weather.sys;
   const aqi = data.pollution?.list?.[0]?.main?.aqi;
   const airQualityDesc = aqi ? getAirQualityDescription(aqi) : 'N/A';
@@ -121,17 +128,25 @@ function createCompactLayout(weather, data, displayUnit, emoji) {
   const aqiColor = getAQIColor(aqi);
 
   return [
-    `${emoji}  ${theme.location(weather.name)}, ${theme.header(weather.sys.country)}`,
+    theme.location(`${weather.name}, ${weather.sys.country}`),
+    '',
     conditionColor(weather.weather[0].description),
-    `🌡️  ${formatTemp(weather.main.temp, displayUnit)} | 💭 ${formatTemp(weather.main.feels_like, displayUnit)}`,
-    `💧 ${theme.humidity(weather.main.humidity + '%')} | 💨 ${windColor(weather.wind.speed + ' ' + (displayUnit === 'fahrenheit' ? 'mph' : 'm/s'))}`,
-    `🌅 ${theme.sunrise(formatTime(sunrise))} | 🌇 ${theme.sunset(formatTime(sunset))}`,
-    `⚠️  Air Quality: ${aqiColor(airQualityDesc + (aqi ? ` (AQI: ${aqi})` : ''))}`
+    '',
+    `Temperature: ${formatTemp(weather.main.temp, displayUnit)}`,
+    `Feels like: ${formatTemp(weather.main.feels_like, displayUnit)}`,
+    '',
+    `Humidity: ${theme.humidity(weather.main.humidity + '%')}`,
+    `Wind: ${windColor(weather.wind.speed + ' ' + (displayUnit === 'fahrenheit' ? 'mph' : 'm/s'))}`,
+    '',
+    `Sunrise: ${theme.sunrise(formatTime(sunrise))}`,
+    `Sunset: ${theme.sunset(formatTime(sunset))}`,
+    '',
+    `Air Quality: ${aqiColor(airQualityDesc + (aqi ? ` (AQI: ${aqi})` : ''))}`
   ].join('\n');
 }
 
 // Medium layout with Tokyo Night colors
-function createMediumLayout(weather, data, displayUnit, emoji) {
+function createMediumLayout(weather, data, displayUnit) {
   const { sunrise, sunset } = weather.sys;
   const aqi = data.pollution?.list?.[0]?.main?.aqi;
   const airQualityDesc = aqi ? getAirQualityDescription(aqi) : 'N/A';
@@ -140,25 +155,32 @@ function createMediumLayout(weather, data, displayUnit, emoji) {
   const aqiColor = getAQIColor(aqi);
 
   const leftSection = [
-    `${emoji}  ${theme.location(weather.name)}, ${theme.header(weather.sys.country)}`,
+    theme.location(`${weather.name}, ${weather.sys.country}`),
+    '',
     conditionColor(weather.weather[0].description),
-    `🌡️  ${formatTemp(weather.main.temp, displayUnit)}`,
-    `💭 ${theme.text('Feels like:')} ${formatTemp(weather.main.feels_like, displayUnit)}`,
-    `💧 ${theme.text('Humidity:')} ${theme.humidity(weather.main.humidity + '%')}`
+    '',
+    formatTemp(weather.main.temp, displayUnit),
+    `${theme.text('Feels like:')} ${formatTemp(weather.main.feels_like, displayUnit)}`,
+    '',
+    `${theme.text('Humidity:')} ${theme.humidity(weather.main.humidity + '%')}`
   ];
 
   const rightSection = [
-    `🌅 ${theme.text('Sunrise:')} ${theme.sunrise(formatTime(sunrise))}`,
-    `🌇 ${theme.text('Sunset:')} ${theme.sunset(formatTime(sunset))}`,
-    `⚠️  ${theme.text('Air Quality:')} ${aqiColor(airQualityDesc + (aqi ? ` (AQI: ${aqi})` : ''))}`,
-    `💨 ${theme.text('Wind:')} ${windColor(weather.wind.speed + ' ' + (displayUnit === 'fahrenheit' ? 'mph' : 'm/s'))}`
+    '',
+    '',
+    `${theme.text('Sunrise:')} ${theme.sunrise(formatTime(sunrise))}`,
+    `${theme.text('Sunset:')} ${theme.sunset(formatTime(sunset))}`,
+    '',
+    `${theme.text('Air Quality:')} ${aqiColor(airQualityDesc + (aqi ? ` (AQI: ${aqi})` : ''))}`,
+    '',
+    `${theme.text('Wind:')} ${windColor(weather.wind.speed + ' ' + (displayUnit === 'fahrenheit' ? 'mph' : 'm/s'))}`
   ];
   
   return createHorizontalLayout(leftSection, rightSection, 35, 40);
 }
 
 // Full horizontal layout with Tokyo Night colors
-function createFullLayout(weather, data, displayUnit, emoji) {
+function createFullLayout(weather, data, displayUnit) {
   const { sunrise, sunset } = weather.sys;
   const aqi = data.pollution?.list?.[0]?.main?.aqi;
   const airQualityDesc = aqi ? getAirQualityDescription(aqi) : 'N/A';
@@ -167,23 +189,29 @@ function createFullLayout(weather, data, displayUnit, emoji) {
   const aqiColor = getAQIColor(aqi);
 
   const leftSection = [
-    `${emoji}  ${theme.location(weather.name)}, ${theme.header(weather.sys.country)}`,
+    theme.location(`${weather.name}, ${weather.sys.country}`),
+    '',
     conditionColor(weather.weather[0].description),
-    `🌡️  ${formatTemp(weather.main.temp, displayUnit)}`,
-    `💭 ${theme.text('Feels like:')} ${formatTemp(weather.main.feels_like, displayUnit)}`,
-    `💧 ${theme.text('Humidity:')} ${theme.humidity(weather.main.humidity + '%')}`,
-    `📊 ${theme.text('Pressure:')} ${theme.pressure(weather.main.pressure + ' hPa')}`,
-    `💨 ${theme.text('Wind:')} ${windColor(weather.wind.speed + ' ' + (displayUnit === 'fahrenheit' ? 'mph' : 'm/s'))}`
+    '',
+    formatTemp(weather.main.temp, displayUnit),
+    '',
+    `${theme.text('Feels like:')} ${formatTemp(weather.main.feels_like, displayUnit)}`,
+    `${theme.text('Humidity:')} ${theme.humidity(weather.main.humidity + '%')}`,
+    `${theme.text('Pressure:')} ${theme.pressure(weather.main.pressure + ' hPa')}`,
+    `${theme.text('Wind:')} ${windColor(weather.wind.speed + ' ' + (displayUnit === 'fahrenheit' ? 'mph' : 'm/s'))}`
   ];
 
   const rightSection = [
-    `🌅 ${theme.text('Sunrise:')} ${theme.sunrise(formatTime(sunrise))}`,
-    `🌇 ${theme.text('Sunset:')} ${theme.sunset(formatTime(sunset))}`,
-    `⚠️  ${theme.text('Air Quality:')} ${aqiColor(airQualityDesc + (aqi ? ` (AQI: ${aqi})` : ''))}`,
-    `🌡️  ${theme.text('Min:')} ${formatTemp(weather.main.temp_min, displayUnit)}`,
-    `🌡️  ${theme.text('Max:')} ${formatTemp(weather.main.temp_max, displayUnit)}`,
-    `🧭 ${theme.text('Wind Dir:')} ${theme.info(weather.wind.deg + '°')}`,
-    `👁️  ${theme.text('Visibility:')} ${theme.info((weather.visibility / 1000) + 'km')}`
+    '',
+    '',
+    `${theme.text('Sunrise:')} ${theme.sunrise(formatTime(sunrise))}`,
+    `${theme.text('Sunset:')} ${theme.sunset(formatTime(sunset))}`,
+    '',
+    `${theme.text('Air Quality:')} ${aqiColor(airQualityDesc + (aqi ? ` (AQI: ${aqi})` : ''))}`,
+    `${theme.text('Min:')} ${formatTemp(weather.main.temp_min, displayUnit)}`,
+    `${theme.text('Max:')} ${formatTemp(weather.main.temp_max, displayUnit)}`,
+    `${theme.text('Wind Dir:')} ${theme.info(weather.wind.deg + '°')}`,
+    `${theme.text('Visibility:')} ${theme.info((weather.visibility / 1000) + 'km')}`
   ];
 
   return createHorizontalLayout(leftSection, rightSection, 50, 60);
@@ -209,7 +237,7 @@ function createHorizontalLayout(leftSection, rightSection, leftWidth, rightWidth
 
 // Display 5-day forecast with Tokyo Night colors
 function display5DayForecast(data, displayUnit) {
-  console.log(theme.header('\n📅 5-Day Forecast:'));
+  console.log(theme.header('\n5-Day Forecast:'));
   
   const dailyData = {};
   data.forecast.list.forEach(item => {
@@ -236,7 +264,7 @@ function display5DayForecast(data, displayUnit) {
 
 // Display 24-hour forecast
 function display24HourForecast(data, displayUnit) {
-  console.log(theme.header('\n⏰ 24-Hour Forecast:'));
+  console.log(theme.header('\n24-Hour Forecast:'));
   
   const next24Hours = data.forecast.list.slice(0, 8); // 3-hour intervals
   
@@ -246,9 +274,7 @@ function display24HourForecast(data, displayUnit) {
       minute: '2-digit',
       hour12: true
     });
-    const emoji = weatherEmojis[item.weather[0].main] || '🌤️';
-    
-    console.log(theme.text(`${time}: ${emoji} ${formatTemp(item.main.temp, displayUnit)} - ${item.weather[0].description}`));
+    console.log(theme.text(`${time}: ${formatTemp(item.main.temp, displayUnit)} - ${item.weather[0].description}`));
   });
 }
 

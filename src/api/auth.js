@@ -18,7 +18,7 @@ export async function getApiKey() {
       return keychainKey;
     }
   } catch (error) {
-    console.warn(theme.warning('⚠️  Keychain access failed, falling back to environment variable'));
+    console.warn(theme.warning('Keychain access failed, falling back to environment variable'));
   }
   
   // Fall back to environment variable
@@ -38,7 +38,7 @@ export async function setApiKey(apiKey) {
     await keytar.setPassword(SERVICE_NAME, ACCOUNT_NAME, apiKey);
     return true;
   } catch (error) {
-    console.warn(theme.warning('⚠️  Could not save to keychain, please use environment variable'));
+    console.warn(theme.warning('Could not save to keychain, please use environment variable'));
     return false;
   }
 }

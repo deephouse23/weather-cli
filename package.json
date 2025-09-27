@@ -1,6 +1,6 @@
 {
   "name": "weather-cli-16bit",
-  "version": "0.3.52",
+  "version": "0.3.55",
   "description": "A beautiful CLI weather application with horizontal layout and enhanced features",
   "main": "index.js",
   "type": "module",
@@ -86,7 +86,6 @@
       "**/test/**/*.spec.js"
     ],
     "transform": {},
-    "extensionsToTreatAsEsm": [".js"],
     "globals": {
       "__ESM__": true
     },

@@ -12,7 +12,7 @@ import { dirname, join } from 'path';
 import { getWeather, getWeatherByCoords } from './src/weather.js';
 import { getCachedWeather, setCachedWeather, cleanExpiredCache, getCacheStats, clearCache } from './src/cache.js';
 import { displayCurrentWeather, display5DayForecast, display24HourForecast } from './src/display.js';
-import { processTemperatureOptions, getDefaultLocation, getDefaultUnits, setDefaultLocation, setDefaultUnits } from './src/config.js';
+import { processTemperatureOptions, getDefaultLocation, getDefaultUnits, setDefaultLocation, setDefaultUnits, shouldShowBetaBanner, setShowBetaBanner } from './src/config.js';
 import { WeatherError, mapErrorToExitCode } from './src/utils/errors.js';
 import { getApiKey, setApiKey, testApiKey } from './src/api/auth.js';
 import { sanitizeLocation } from './src/utils/validators.js';
@@ -28,10 +28,12 @@ const packageJson = JSON.parse(readFileSync(join(__dirname, 'package.json'), 'ut
 const VERSION = packageJson.version;
 
 // Beta banner function
-function showBetaBanner() {
+async function showBetaBanner() {
   if (process.argv.includes('--no-beta-banner') || program.opts().noBetaBanner) return;
-  
-  console.log(theme.warning(`
+
+  const shouldShow = await shouldShowBetaBanner();
+  if (shouldShow) {
+    console.log(theme.warning(`
 ╔══════════════════════════════════════╗
 ║              BETA SOFTWARE           ║
 ║                                      ║
@@ -42,21 +44,22 @@ function showBetaBanner() {
 ║    github.com/deephouse23/weather-cli║
 ╚══════════════════════════════════════╝
 `));
+  }
 }
 
 // Compare weather between two cities
 async function compareWeather(city1, city2, userUnits = null) {
-  console.log(theme.header(`\n🌍 Comparing weather: ${city1} vs ${city2}`));
+  console.log(theme.header(`\nComparing weather: ${city1} vs ${city2}`));
   
   const [data1, data2] = await Promise.all([
     getWeather(city1, userUnits),
     getWeather(city2, userUnits)
   ]);
   
-  console.log(theme.success('\n📍 City 1:'));
+  console.log(theme.success('\nCity 1:'));
   displayCurrentWeather(data1, data1.displayUnit);
-  
-  console.log(theme.success('\n📍 City 2:'));
+
+  console.log(theme.success('\nCity 2:'));
   displayCurrentWeather(data2, data2.displayUnit);
     
     // Compare temperatures
@@ -64,7 +67,7 @@ async function compareWeather(city1, city2, userUnits = null) {
     const temp2 = data2.current.main.temp;
     const diff = Math.abs(temp1 - temp2);
     
-    console.log(theme.warning(`\n🌡️  Temperature difference: ${diff.toFixed(1)}°${data1.displayUnit === 'fahrenheit' ? 'F' : 'C'}`));
+    console.log(theme.warning(`\nTemperature difference: ${diff.toFixed(1)}°${data1.displayUnit === 'fahrenheit' ? 'F' : 'C'}`));
     
     if (temp1 > temp2) {
       console.log(theme.error(`${city1} is warmer by ${diff.toFixed(1)}°`));
@@ -136,14 +139,14 @@ async function interactiveMode() {
   if (saveDefault.save) {
     await setDefaultLocation(answers.location);
     await setDefaultUnits(answers.units);
-    console.log(theme.success('✅ Default settings saved!'));
+    console.log(theme.success('Default settings saved!'));
   }
 }
 
 // Error handler wrapper
 function handleError(error) {
   if (error instanceof WeatherError) {
-    console.error(theme.error(`❌ ${error.message}`));
+    console.error(theme.error(`${error.message}`));
     
     // Add helpful hints for specific errors
     if (error.code === 'API_KEY_MISSING') {
@@ -153,7 +156,7 @@ function handleError(error) {
       console.log(theme.warning('Examples: "San Ramon, CA" or "London, UK"'));
     }
   } else {
-    console.error(theme.error(`❌ Unexpected error: ${error.message}`));
+    console.error(theme.error(`Unexpected error: ${error.message}`));
   }
   
   process.exit(mapErrorToExitCode(error));
@@ -175,7 +178,7 @@ program
     if (!location) {
       const defaultLocation = await getDefaultLocation();
       if (!defaultLocation) {
-        console.error(theme.error('❌ No location provided and no default set'));
+        console.error(theme.error('No location provided and no default set'));
         console.log(theme.warning('Usage: weather "City, State" or weather "City, Country"'));
         console.log(theme.warning('Examples: weather "San Ramon, CA" or weather "London, UK"'));
         throw new WeatherError('No location provided', 'INVALID_INPUT');
@@ -209,7 +212,7 @@ program
     if (!location) {
       const defaultLocation = await getDefaultLocation();
       if (!defaultLocation) {
-        console.error(theme.error('❌ No location provided and no default set'));
+        console.error(theme.error('No location provided and no default set'));
         throw new WeatherError('No location provided', 'INVALID_INPUT');
       }
       location = defaultLocation;
@@ -231,7 +234,7 @@ program
     if (!location) {
       const defaultLocation = await getDefaultLocation();
       if (!defaultLocation) {
-        console.error(theme.error('❌ No location provided and no default set'));
+        console.error(theme.error('No location provided and no default set'));
         throw new WeatherError('No location provided', 'INVALID_INPUT');
       }
       location = defaultLocation;
@@ -293,7 +296,7 @@ program
     
     await setDefaultLocation(answers.defaultLocation);
     await setDefaultUnits(answers.defaultUnits);
-    console.log(theme.success('✅ Configuration saved!'));
+    console.log(theme.success('Configuration saved!'));
   });
 
 const authCommand = program
@@ -321,9 +324,9 @@ authCommand
       const saved = await setApiKey(answers.apiKey);
       
       if (saved) {
-        console.log(theme.success('✅ API key saved to system keychain'));
+        console.log(theme.success('API key saved to system keychain'));
       } else {
-        console.log(theme.warning('⚠️  Could not save to keychain, please set WEATHER_API_KEY environment variable'));
+        console.log(theme.warning('Could not save to keychain, please set WEATHER_API_KEY environment variable'));
       }
     } catch (error) {
       throw new WeatherError('Invalid API key', 'API_KEY_INVALID');
@@ -335,7 +338,7 @@ authCommand
   .description('Test API key validity')
   .action(async () => {
     await testApiKey();
-    console.log(theme.success('✅ API key is valid'));
+    console.log(theme.success('API key is valid'));
   });
 
 program
@@ -346,15 +349,15 @@ program
   .action(async (options) => {
     if (options.clear) {
       await clearCache();
-      console.log(theme.success('✅ Cache cleared!'));
+      console.log(theme.success('Cache cleared!'));
     } else if (options.clean) {
       const cleaned = await cleanExpiredCache();
       if (cleaned === 0) {
-        console.log(theme.info('📦 No expired entries to clean'));
+        console.log(theme.info('No expired entries to clean'));
       }
     } else {
       const stats = await getCacheStats();
-      console.log(theme.info(`📦 Cache statistics:`));
+      console.log(theme.info(`Cache statistics:`));
       console.log(theme.text(`  Total entries: ${stats.total}`));
       console.log(theme.success(`  Valid entries: ${stats.valid}`));
       console.log(theme.warning(`  Expired entries: ${stats.expired}`));
