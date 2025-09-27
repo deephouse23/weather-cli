@@ -11,7 +11,7 @@ Command-line weather application with clean horizontal layout and responsive des
 
 Install globally:
 ```bash
-npm install -g weather-cli-16bit
+npm i -g weather-cli-16bit
 ```
 
 ## Usage
