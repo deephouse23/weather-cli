@@ -1,7 +1,7 @@
 {
   "name": "weather-cli-16bit",
-  "version": "0.3.55",
-  "description": "A beautiful CLI weather application with horizontal layout and enhanced features",
+  "version": "0.3.6",
+  "description": "Command-line weather tool with formatted display and Tokyo Night theme",
   "main": "index.js",
   "type": "module",
   "bin": {
