@@ -1,4 +1,4 @@
-# weather-cli-16bit v0.3.52 - Tokyo Night Visual Refresh
+# weather-cli-16bit v0.3.55 - Clean Interface Release
 
 Beautiful new Tokyo Night color theme brings modern, consistent visual design to your weather CLI experience.
 
@@ -26,7 +26,7 @@ Transform your weather display with the popular Tokyo Night color palette:
 ## Installation
 
 ```bash
-npm install -g weather-cli-16bit@0.3.52
+npm install -g weather-cli-16bit@0.3.55
 ```
 
 ## Usage
