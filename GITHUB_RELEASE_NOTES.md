@@ -1,4 +1,4 @@
-# weather-cli-16bit v0.3.6 - Formatted Display & Enhanced Colors
+# weather-cli-16bit v0.3.56 - Formatted Display & Enhanced Colors
 
 Clean, structured weather display with improved Tokyo Night color theme for better readability and visual appeal.
 
@@ -29,7 +29,7 @@ Improved color scheme with semantic meaning:
 ## Installation
 
 ```bash
-npm install -g weather-cli-16bit@0.3.6
+npm install -g weather-cli-16bit@0.3.56
 ```
 
 ## Usage

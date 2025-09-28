@@ -1,14 +1,14 @@
-# weather-cli-16bit v0.3.6
+# weather-cli-16bit v0.3.56
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.3.6-orange)
+![Version](https://img.shields.io/badge/version-0.3.56-orange)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
 
 A command-line weather tool that shows current conditions in a clean, formatted display. Get weather data for any location with a simple terminal command.
 
-## What's New in v0.3.6
+## What's New in v0.3.56
 
 ### Formatted Display Layout
 - Clean two-column grid layout for weather data

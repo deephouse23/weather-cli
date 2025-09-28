@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.56] - 2025-09-28
+
+### Fixed
+- Version numbering issue that prevented npm publication
+- Updated from incorrectly formatted v0.3.6 to proper semantic version 0.3.56
+
+### Changed
+- Cleaned up old feature branches that were already merged
+- Updated all documentation files to reflect correct version
+
+### Technical
+- Resolved npm publication conflict with existing version 0.3.55
+- Standardized version references across all project files
+
 ## [0.3.52] - 2025-09-25
 
 ### Added
