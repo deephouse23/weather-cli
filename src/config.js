@@ -61,6 +61,19 @@ async function setDefaultUnits(units) {
   await saveConfig(config);
 }
 
+// Get show 5-day forecast setting
+async function getShow5DayForecast() {
+  const config = await loadConfig();
+  return config.show5DayForecast || false;
+}
+
+// Set show 5-day forecast setting
+async function setShow5DayForecast(show) {
+  const config = await loadConfig();
+  config.show5DayForecast = show;
+  await saveConfig(config);
+}
+
 // Process temperature options from command line
 function processTemperatureOptions(options) {
   if (options.celsius) return 'celsius';
@@ -78,6 +91,8 @@ export {
   getDefaultUnits,
   setDefaultLocation,
   setDefaultUnits,
+  getShow5DayForecast,
+  setShow5DayForecast,
   processTemperatureOptions,
   shouldShowBetaBanner,
   setShowBetaBanner

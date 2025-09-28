@@ -12,7 +12,7 @@ import { dirname, join } from 'path';
 import { getWeather, getWeatherByCoords } from './src/weather.js';
 import { getCachedWeather, setCachedWeather, cleanExpiredCache, getCacheStats, clearCache } from './src/cache.js';
 import { displayCurrentWeather, display5DayForecast, display24HourForecast } from './src/display.js';
-import { processTemperatureOptions, getDefaultLocation, getDefaultUnits, setDefaultLocation, setDefaultUnits, shouldShowBetaBanner, setShowBetaBanner } from './src/config.js';
+import { processTemperatureOptions, getDefaultLocation, getDefaultUnits, setDefaultLocation, setDefaultUnits, getShow5DayForecast, setShow5DayForecast, shouldShowBetaBanner, setShowBetaBanner } from './src/config.js';
 import { WeatherError, mapErrorToExitCode } from './src/utils/errors.js';
 import { getApiKey, setApiKey, testApiKey } from './src/api/auth.js';
 import { sanitizeLocation } from './src/utils/validators.js';
@@ -194,12 +194,23 @@ program
     if (cached) {
       console.log(theme.muted('📦 Using cached data...'));
       displayCurrentWeather(cached, cached.displayUnit);
+      // Check if 5-day forecast should be shown
+      const show5Day = await getShow5DayForecast();
+      if (show5Day) {
+        display5DayForecast(cached, cached.displayUnit);
+      }
       return;
     }
     
     const data = await getWeather(location, userUnits);
     await setCachedWeather(location, cacheKey, data);
     displayCurrentWeather(data, data.displayUnit);
+
+    // Check if 5-day forecast should be shown
+    const show5Day = await getShow5DayForecast();
+    if (show5Day) {
+      display5DayForecast(data, data.displayUnit);
+    }
   });
 
 program
@@ -291,11 +302,18 @@ program
           { name: 'Fahrenheit (°F)', value: 'fahrenheit' }
         ],
         default: await getDefaultUnits()
+      },
+      {
+        type: 'confirm',
+        name: 'show5DayForecast',
+        message: 'Show 5-day forecast with current weather?',
+        default: await getShow5DayForecast()
       }
     ]);
-    
+
     await setDefaultLocation(answers.defaultLocation);
     await setDefaultUnits(answers.defaultUnits);
+    await setShow5DayForecast(answers.show5DayForecast);
     console.log(theme.success('Configuration saved!'));
   });
 
@@ -405,13 +423,19 @@ async function main() {
       
       const data = await getWeather(cleanLocation, userUnits);
       displayCurrentWeather(data, data.displayUnit);
-      
+
       if (showAlerts) {
         // Alerts are already shown in displayCurrentWeather
       }
-      
+
       if (showForecast) {
         display24HourForecast(data, data.displayUnit);
+      }
+
+      // Check if 5-day forecast should be shown
+      const show5Day = await getShow5DayForecast();
+      if (show5Day) {
+        display5DayForecast(data, data.displayUnit);
       }
     } else {
       // Parse as normal commander commands

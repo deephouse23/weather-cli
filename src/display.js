@@ -405,27 +405,37 @@ function createHorizontalLayout(leftSection, rightSection, leftWidth, rightWidth
 // Display 5-day forecast with Tokyo Night colors
 function display5DayForecast(data, displayUnit) {
   console.log(theme.header('\n5-Day Forecast:'));
-  
+
   const dailyData = {};
   data.forecast.list.forEach(item => {
     const date = new Date(item.dt * 1000).toDateString();
     if (!dailyData[date]) {
       dailyData[date] = {
         temps: [],
+        minTemps: [],
+        maxTemps: [],
         descriptions: []
       };
     }
+    // Collect all temperature data points
     dailyData[date].temps.push(item.main.temp);
+    dailyData[date].minTemps.push(item.main.temp_min);
+    dailyData[date].maxTemps.push(item.main.temp_max);
     dailyData[date].descriptions.push(item.weather[0].description);
   });
-  
+
   Object.entries(dailyData).forEach(([date, info]) => {
-    const avgTemp = info.temps.reduce((a, b) => a + b, 0) / info.temps.length;
-    const mostCommonDesc = info.descriptions.sort((a, b) => 
+    // Calculate the actual min and max from all data points for the day
+    const dayMin = Math.min(...info.temps, ...info.minTemps);
+    const dayMax = Math.max(...info.temps, ...info.maxTemps);
+    const mostCommonDesc = info.descriptions.sort((a, b) =>
       info.descriptions.filter(v => v === a).length - info.descriptions.filter(v => v === b).length
     ).pop();
-    
-    console.log(theme.text(`${date}: ${formatTemp(avgTemp, displayUnit)} - ${mostCommonDesc}`));
+
+    // Format with both min and max temperatures
+    const minTempStr = formatTemp(dayMin, displayUnit);
+    const maxTempStr = formatTemp(dayMax, displayUnit);
+    console.log(theme.text(`${date}: Min: ${minTempStr} / Max: ${maxTempStr} - ${mostCommonDesc}`));
   });
 }
 

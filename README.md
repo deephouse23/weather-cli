@@ -1,25 +1,24 @@
-# weather-cli-16bit v0.3.56
+# weather-cli-16bit v0.3.57
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.3.56-orange)
+![Version](https://img.shields.io/badge/version-0.3.57-orange)
 ![16bitweather](https://img.shields.io/badge/16bitweather-weather_suite-brightgreen)
 ![Beta](https://img.shields.io/badge/status-beta-yellow.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14-brightgreen.svg)
 
 A command-line weather tool that shows current conditions in a clean, formatted display. Get weather data for any location with a simple terminal command.
 
-## What's New in v0.3.56
+## What's New in v0.3.57
 
-### Formatted Display Layout
-- Clean two-column grid layout for weather data
-- Consistent spacing and alignment for better readability
-- Structured sections: header, temperature, time/environmental, atmospheric
+### Improved 5-Day Forecast
+- Now displays both minimum and maximum temperatures for each day
+- More accurate temperature ranges instead of just averages
+- Clear format: Min: XX / Max: XX for each day
 
-### Tokyo Night Color Theme
-- Beautiful color scheme with semantic meaning
-- Temperature colors that change based on actual values (blue for cold, red for hot)
-- Air quality indicators with appropriate colors (green=good, red=unhealthy)
-- Dimmed text for less important information
+### Configurable 5-Day Forecast
+- New configuration option to automatically show 5-day forecast with every weather query
+- Toggle the feature on or off through the config command
+- When enabled, the 5-day forecast displays after current weather for all location queries
 
 ## Quick Start
 
@@ -80,6 +79,16 @@ Visibility:      10 km  |  UV Index:        N/A
 ```
 
 ## Configuration
+
+### Default Settings
+```bash
+weather config  # Configure location, units, and 5-day forecast display
+```
+
+Options include:
+- Default location for weather queries
+- Temperature units (auto, Celsius, or Fahrenheit)
+- Show 5-day forecast automatically (on/off)
 
 ### API Key
 ```bash
