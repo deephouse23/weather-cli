@@ -446,7 +446,17 @@ async function main() {
 
       const showForecast = args.includes('-f') || args.includes('--forecast');
 
-      const data = await getWeather(location, userUnits);
+      // Check cache first
+      const cacheKey = userUnits || 'auto';
+      const cached = await getCachedWeather(location, cacheKey);
+      let data;
+      if (cached) {
+        console.log(chalk.gray('📦 Using cached data...'));
+        data = cached;
+      } else {
+        data = await getWeather(location, userUnits);
+        await setCachedWeather(location, cacheKey, data);
+      }
       displayCurrentWeather(data, data.displayUnit);
 
       if (showForecast) {
