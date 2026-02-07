@@ -75,3 +75,13 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Claude Code
+.claude/
+
+# Playwright
+playwright-report/
+test-results/
+
+# Misc
+Inpower/

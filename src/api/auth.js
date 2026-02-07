@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import chalk from 'chalk';
 import { WeatherError, ERROR_CODES } from '../utils/errors.js';
 import httpClient from './http.js';
-import { theme } from '../theme.js';
 
 dotenv.config();
 
@@ -18,9 +17,9 @@ export async function getApiKey() {
       return keychainKey;
     }
   } catch (error) {
-    console.warn(theme.warning('Keychain access failed, falling back to environment variable'));
+    console.warn(chalk.yellow('⚠️  Keychain access failed, falling back to environment variable'));
   }
-  
+
   // Fall back to environment variable
   const envKey = process.env.WEATHER_API_KEY;
   if (!envKey || envKey === 'your_openweathermap_api_key_here') {
@@ -29,7 +28,7 @@ export async function getApiKey() {
       ERROR_CODES.API_KEY_MISSING
     );
   }
-  
+
   return envKey;
 }
 
@@ -38,7 +37,7 @@ export async function setApiKey(apiKey) {
     await keytar.setPassword(SERVICE_NAME, ACCOUNT_NAME, apiKey);
     return true;
   } catch (error) {
-    console.warn(theme.warning('Could not save to keychain, please use environment variable'));
+    console.warn(chalk.yellow('⚠️  Could not save to keychain, please use environment variable'));
     return false;
   }
 }
@@ -52,8 +51,8 @@ export async function deleteApiKey() {
 }
 
 export async function testApiKey(apiKey = null) {
-  const key = apiKey || await getApiKey();
-  
+  const key = apiKey || (await getApiKey());
+
   try {
     const response = await httpClient.get('https://api.openweathermap.org/data/2.5/weather', {
       params: {
@@ -62,7 +61,7 @@ export async function testApiKey(apiKey = null) {
         units: 'metric'
       }
     });
-    
+
     return response.status === 200;
   } catch (error) {
     if (error.response?.status === 401) {

@@ -1,74 +1,52 @@
-# Development and testing files
-test/
-coverage/
-*.test.js
-*.spec.js
-.nyc_output/
-
-# Documentation and meta files
-docs/
-TESTING.md
-CONTRIBUTING.md
-RELEASE_NOTES_*.md
-RELEASE_TAG_SUMMARY.md
-
-# Environment and config files
-.env
-.env.example
-.env.local
-.env.development
-.env.production
-.weather-config.json
-.weather-cache.json
+# Development files
 .claude/
-
-# Git files
 .git/
-.gitignore
-.gitattributes
-
-# CI/CD and build files
 .github/
-.travis.yml
-.circleci/
-Dockerfile
-docker-compose.yml
+node_modules/
 
-# Editor and IDE files
+# Test files
+test-*.js
+smoke-test.sh
+
+# Documentation (extra - main docs are included via files field)
+CHANGELOG_v*.md
+CLEAN_BRANCH_SUMMARY.md
+CONTRIBUTING.md
+FINAL_SECURITY_SUMMARY.md
+GITHUB_*.md
+PR_*.md
+RELEASE_COMMANDS.md
+RELEASE_NOTES_v*.md
+SECURITY_REVIEW.md
+V0.3.0-SECURITY-SUMMARY.md
+
+# Environment files
+.env
+.env.*
+.weather-cache.json
+.weather-config.json
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-.DS_Store
 
-# Logs and temporary files
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
+# Build artifacts
+dist/
+build/
+coverage/
+
+# Cache directories
+.cache/
+.npm/
+.nyc_output/
+
+# Temporary files
 *.tmp
 *.temp
-.cache/
-.parcel-cache/
-
-# Backup files
-*.bak
-*.backup
-
-# OS generated files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Development tools output
-test-modules.js
-test-validators.js
-test-performance.js
-test-auth.js
-
-# Local development files
-node_modules/
-src/**/*.local.*

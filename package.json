@@ -1,33 +1,62 @@
 {
   "name": "weather-cli-16bit",
-  "version": "0.3.57",
-  "description": "Command-line weather tool with formatted display and Tokyo Night theme",
+  "version": "0.3.24",
+  "description": "A simple, intelligent weather CLI with smart location detection - no quotes needed",
   "main": "index.js",
   "type": "module",
   "bin": {
-    "weather": "./index.js"
+    "weather": "./bin/weather.js"
   },
   "preferGlobal": true,
-  "stability": "beta",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "files": [
+    "bin/",
+    "src/",
+    "index.js",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --watchAll=false",
+    "start": "node bin/weather.js",
+    "dev": "node --watch bin/weather.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ci": "vitest run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "echo 'Build successful - CLI ready for distribution'",
-    "test:legacy": "node test-modules.js"
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky",
+    "prepublishOnly": "npm run lint && npm run test:ci"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "keywords": [
     "weather",
     "cli",
-    "terminal",
+    "command-line",
     "forecast",
-    "horizontal-layout",
-    "responsive-design"
+    "temperature",
+    "no-quotes",
+    "smart-location",
+    "openweathermap",
+    "location-search",
+    "secure-auth",
+    "responsive-design",
+    "weather-forecast"
   ],
   "author": "16bitweather <justinelrod111@gmail.com>",
   "license": "MIT",
@@ -40,7 +69,7 @@
     "url": "https://github.com/deephouse23/weather-cli/issues"
   },
   "dependencies": {
-    "axios": "^1.12.2",
+    "axios": "^1.11.0",
     "axios-retry": "^4.0.0",
     "boxen": "^7.1.1",
     "chalk": "^5.5.0",
@@ -51,44 +80,15 @@
     "ora": "^8.2.0"
   },
   "devDependencies": {
-    "@jest/globals": "^29.7.0",
-    "eslint": "^8.57.0",
-    "execa": "^8.0.1",
-    "jest": "^29.7.0",
-    "nock": "^13.4.0",
-    "tmp": "^0.2.1"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": ["<rootDir>/test/setup.js"],
-    "collectCoverageFrom": [
-      "src/**/*.js",
-      "index.js",
-      "!src/**/*.test.js",
-      "!**/node_modules/**"
-    ],
-    "coverageDirectory": "coverage",
-    "coverageReporters": [
-      "text",
-      "lcov",
-      "html"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 75,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      }
-    },
-    "testMatch": [
-      "**/test/**/*.test.js",
-      "**/test/**/*.spec.js"
-    ],
-    "transform": {},
-    "globals": {
-      "__ESM__": true
-    },
-    "testTimeout": 30000
+    "@playwright/mcp": "^0.0.35",
+    "@modelcontextprotocol/server-filesystem": "^2025.8.21",
+    "@playwright/test": "^1.55.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "playwright": "^1.55.0",
+    "prettier": "^3.0.0",
+    "vitest": "^3.0.0"
   }
 }

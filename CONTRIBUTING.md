@@ -5,7 +5,8 @@ Thank you for your interest in contributing to the Weather CLI! This project is 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v14 or higher)
+
+- Node.js (v18 or higher)
 - npm (comes with Node.js)
 - Git
 - A text editor or IDE
@@ -14,17 +15,20 @@ Thank you for your interest in contributing to the Weather CLI! This project is 
 
 1. Fork the repository on GitHub
 2. Clone your fork locally:
+
    ```bash
    git clone https://github.com/your-username/weather-cli.git
    cd weather-cli
    ```
 
 3. Install dependencies:
+
    ```bash
    npm install
    ```
 
 4. Set up your environment:
+
    ```bash
    cp .env.example .env
    # Add your OpenWeatherMap API key to .env
@@ -64,6 +68,7 @@ We welcome feature suggestions! Please:
 ### Submitting Pull Requests
 
 1. **Create a feature branch** from `main`:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -75,17 +80,21 @@ We welcome feature suggestions! Please:
    - Update documentation if needed
 
 3. **Test your changes**:
+
    ```bash
-   npm start
-   # Test various commands and options
+   npm test              # Run unit tests
+   npm run lint          # Check for lint errors
+   npm run format:check  # Check formatting
    ```
 
 4. **Commit your changes**:
+
    ```bash
    git commit -m "Add feature: description of your changes"
    ```
 
 5. **Push to your fork**:
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -118,16 +127,36 @@ The project uses a single-file architecture (`index.js`) for simplicity. When ad
 
 ## Testing
 
-Currently, this project relies on manual testing. When adding features:
+This project uses [Vitest](https://vitest.dev/) for unit testing. Test files live in `tests/unit/`.
 
-1. Test all existing commands still work
-2. Test your new feature with various inputs
+```bash
+npm test              # Run all tests once
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Run tests with coverage report
+```
+
+When adding features:
+
+1. Add unit tests for new logic in `tests/unit/`
+2. Ensure all existing tests pass with `npm test`
 3. Test error conditions (invalid API key, network issues, etc.)
 4. Test on different operating systems if possible
+
+## Linting & Formatting
+
+This project uses ESLint and Prettier. A pre-commit hook runs lint-staged automatically.
+
+```bash
+npm run lint          # Check for lint errors
+npm run lint:fix      # Auto-fix lint errors
+npm run format        # Format all files
+npm run format:check  # Check formatting without writing
+```
 
 ## Feature Ideas
 
 Some features we'd love to see:
+
 - Weather maps and visualizations
 - More detailed weather alerts
 - Support for multiple saved locations
@@ -138,6 +167,7 @@ Some features we'd love to see:
 ## Questions?
 
 If you have questions about contributing:
+
 - Create an issue with the "question" label
 - Check existing issues for similar questions
 - Reach out to the 16bitweather team
