@@ -34,19 +34,6 @@ async function getDefaultUnits() {
   return config.defaultUnits || 'auto';
 }
 
-// Check if beta banner should be shown
-async function shouldShowBetaBanner() {
-  const config = await loadConfig();
-  return config.showBetaBanner === true;
-}
-
-// Toggle beta banner setting
-async function setShowBetaBanner(show) {
-  const config = await loadConfig();
-  config.showBetaBanner = show;
-  await saveConfig(config);
-}
-
 // Set default location
 async function setDefaultLocation(location) {
   const config = await loadConfig();
@@ -58,19 +45,6 @@ async function setDefaultLocation(location) {
 async function setDefaultUnits(units) {
   const config = await loadConfig();
   config.defaultUnits = units;
-  await saveConfig(config);
-}
-
-// Get show 5-day forecast setting
-async function getShow5DayForecast() {
-  const config = await loadConfig();
-  return config.show5DayForecast || false;
-}
-
-// Set show 5-day forecast setting
-async function setShow5DayForecast(show) {
-  const config = await loadConfig();
-  config.show5DayForecast = show;
   await saveConfig(config);
 }
 
@@ -91,9 +65,5 @@ export {
   getDefaultUnits,
   setDefaultLocation,
   setDefaultUnits,
-  getShow5DayForecast,
-  setShow5DayForecast,
-  processTemperatureOptions,
-  shouldShowBetaBanner,
-  setShowBetaBanner
+  processTemperatureOptions
 };

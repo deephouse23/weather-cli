@@ -5,80 +5,101 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.56] - 2025-09-28
+## [0.3.2] - 2025-08-26
 
-### Fixed
-- Version numbering issue that prevented npm publication
-- Updated from incorrectly formatted v0.3.6 to proper semantic version 0.3.56
+### 🐛 **Fixed**
 
-### Changed
-- Cleaned up old feature branches that were already merged
-- Updated all documentation files to reflect correct version
+- **State Code Support**: Fixed US state code (CA) to country code (US) conversion for OpenWeatherMap API
+- **Data Structure Error**: Fixed "Cannot read properties of undefined" error in weather display
+- **CLI Crashes**: Removed duplicate command definitions that were causing application crashes
 
-### Technical
-- Resolved npm publication conflict with existing version 0.3.55
-- Standardized version references across all project files
+### 🔧 **Improved**
 
-## [0.3.52] - 2025-09-25
+- **Location Flexibility**: Now accepts locations with or without comma separators
+- **State Mapping**: Added automatic state-to-country code mapping for all 50 US states
+- **Error Messages**: Enhanced error messages with helpful examples like "San Ramon, US"
+- **Data Validation**: Added proper data structure validation in display module
 
-### Added
-- Tokyo Night color theme throughout the application
-- Temperature gradient colors based on temperature ranges
-- Weather condition contextual colors
-- Air Quality Index (AQI) color indicators
-- Wind speed color coding based on Beaufort scale
-- Comprehensive theme system in src/theme.js
-- Smart color mapping for weather severity and conditions
+### 🧪 **Tested**
 
-### Changed
-- Replaced all direct chalk color calls with themed color functions
-- Updated display.js to use Tokyo Night color palette
-- Enhanced visual accessibility with high contrast colors
-- Improved terminal compatibility for modern environments
+- Works with `weather "San Ramon, CA"` - automatically converts to US
+- Case insensitive: `weather "san ramon, ca"` works correctly
+- Flexible input: `weather "san ramon"` works without state/country code
+- Invalid locations show helpful error messages
 
-### Technical
-- Created modular theme system for easy customization
-- Temperature colors adapt to Celsius/Fahrenheit units
-- Consistent color mapping across all weather displays
-- Updated all output functions to use themed colors
+## [0.3.1] - 2025-08-25
 
-## [0.3.25] - 2025-09-20
+### 📦 **NPM Package Release**
 
-### Added
-- Enhanced rate limit messages with retry hints and API tier information
-- Major cities support - 70+ cities work without country/state requirement
-- Debug logging via WEATHER_DEBUG environment variable for network troubleshooting
+- **Global Installation**: Now available as `weather-cli-16bit` on npm
+- **Unique Package Name**: Uses scoped name to avoid npm conflicts
+- **Proper Bin Structure**: Added `bin/weather.js` executable with cross-platform compatibility
+- **NPM Ready**: Complete package configuration with proper files, engines, and metadata
 
-### Changed
-- Clean documentation with improved user experience
-- Better error messaging and guidance
+### 🔧 **Package Configuration**
 
-## [0.3.0] - 2025-09-15
+- **Semantic Versioning**: Updated to v0.3.1 following semver standards
+- **Node.js Requirements**: Requires Node.js v14.0.0 or higher
+- **Cross-Platform Support**: Works on macOS, Windows, and Linux
+- **NPM Ignore**: Proper `.npmignore` file excluding development files
 
-### Added
-- OS Keychain integration for secure API key storage using keytar
-- Input sanitization and injection attack protection
-- Structured error handling with specific error codes
-- Automatic retry logic with exponential backoff for network issues
-- Timeout protection (5-second timeout) to prevent hanging requests
-- Enhanced caching with size limits, age limits, and LRU eviction
-- Comprehensive testing suite including security, performance, and smoke tests
-- New authentication commands: weather auth set and weather auth test
+### 📚 **Documentation Updates**
 
-### Changed
-- Eliminated all process.exit() calls from libraries for better reliability
-- API keys never appear in logs or error messages for security
-- Cache failures no longer affect weather lookups
-- Cross-platform verification on macOS, Windows, and Linux
+- **Installation Guide**: Updated README with npm installation instructions
+- **Package Information**: Added NPM package details and update commands
+- **Usage Examples**: Enhanced examples for global installation
+- **Version Alignment**: All version references updated to v0.3.1
 
-### Security
-- Zero API key exposure in logs or error messages
-- Comprehensive protection against injection attacks
-- Secure credential management with OS keychain integration
+## [0.4.0] - 2025-08-25 (Previous Release)
+
+### 🔍 **Added**
+
+- **Smart location parsing** that automatically tries multiple search formats
+- **Flexible location input** - works with just city names, no state/country required
+- **Automatic fallback searches** - tries variations like "US" and "USA"
+- **Better error messages** showing all attempted searches
+- **Support for multiple formats**: "City", "City, State", "City, Country", zip codes
+
+### 🐛 **Fixed**
+
+- Resolved merge conflicts from v0.3.0 integration
+- Fixed duplicate code sections in index.js
+- Corrected auth command structure
+- Fixed command parsing for various input formats
+
+### 📝 **Changed**
+
+- Enhanced location search algorithm for better results
+- Improved error messages with helpful suggestions
+- Updated documentation with new examples
+
+## [0.3.0] - 2025-01-08
+
+### 🔒 **Security**
+
+- **OS Keychain Integration** - API keys stored securely using keytar
+- **Zero Exposure** - API keys never appear in logs or error messages
+- **Input Sanitization** - Comprehensive protection against injection attacks
+- **Auth Commands** - New `weather auth set` and `weather auth test` commands
+
+### ⚡ **Reliability**
+
+- **No More Crashes** - Eliminated all process.exit() calls from libraries
+- **Smart Retry Logic** - Automatic retry with exponential backoff
+- **Structured Errors** - Specific error codes with recovery suggestions
+- **Timeout Protection** - 5-second timeout prevents hanging requests
+
+### 📦 **Caching**
+
+- **Size Limits** - Maximum 100 entries prevent unlimited growth
+- **Age Limits** - 7-day maximum age for cache entries
+- **LRU Eviction** - Intelligent removal of least-used entries
+- **Cache Safety** - Failures don't affect weather lookups
 
 ## [0.0.24] - 2025-01-07
 
 ### 🎨 **Added**
+
 - **Horizontal layout** with responsive design that adapts to terminal width
 - **City, State format requirement** for better location accuracy
 - **Enhanced location display** with city name in cyan and state/country in yellow
@@ -91,6 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Better error handling** with informative messages and validation
 
 ### 🏗️ **Architecture Changes**
+
 - **Split monolithic file** into modular structure:
   - `src/weather.js` - API calls and weather logic
   - `src/cache.js` - Caching with expiration
@@ -101,6 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Better validation** for location format requirements
 
 ### 🔒 **Security**
+
 - **Fixed .env file tracking** - Removed from git to prevent API key exposure
 - **Updated dependencies** - Fixed security vulnerabilities in inquirer
 - **Secure error messages** - No API key exposure in error output
@@ -108,23 +131,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clean documentation** - Removed API keys from documentation
 
 ### 🎯 **Breaking Changes**
+
 - **Required format change**: Now requires `"City, State"` or `"City, Country"` format
 - **Old format no longer works**: `weather "London"` now requires `weather "London, UK"`
 - **Enhanced validation**: Clear error messages when format is incorrect
 
 ### 📊 **Performance**
+
 - **Reduced API calls** through intelligent caching
 - **Better cache management** with automatic expiration
 - **Improved response times** with cache hit optimization
 - **Memory optimization** with proper cleanup of expired entries
 
 ### 🧪 **Testing**
+
 - **Added test files** for modules, basic functionality, and responsive design
 - **Performance testing** with benchmarks and metrics
 - **Security testing** with API key validation checks
 - **Module testing** for all new modular components
 
 ### 📚 **Documentation**
+
 - **Updated README** with new features and requirements
 - **Added comprehensive examples** for all new features
 - **Security documentation** with best practices
@@ -133,6 +160,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.23] - 2025-01-06
 
 ### 🔒 **Security**
+
 - Updated vulnerable dependencies
 - Enhanced API key validation
 - Improved error handling
@@ -140,6 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.22] - 2025-01-05
 
 ### ✨ **Added**
+
 - Initial beta release
 - Basic weather functionality
 - Interactive mode
@@ -147,6 +176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cache system
 
 ### 🐛 **Fixed**
+
 - Various bug fixes and improvements
 
 ---
@@ -162,16 +192,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### From v0.0.22 to v0.0.24
 
 **Breaking Changes:**
+
 1. **Location Format**: Now requires `"City, State"` format
+
    ```bash
    # Old (no longer works)
    weather "London"
-   
+
    # New (required)
    weather "London, UK"
    ```
 
 2. **Installation**: Updated dependencies require reinstall
+
    ```bash
    npm install -g weather-cli
    ```
@@ -183,6 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    ```
 
 **New Features:**
+
 - Horizontal layout with responsive design
 - Enhanced caching with expiration
 - Better error messages and validation

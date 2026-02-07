@@ -37,18 +37,18 @@ async function saveCache(cache) {
 async function evictOldEntries(cache) {
   const entries = Object.entries(cache);
   const now = Date.now();
-  
+
   // Remove very old entries first
   let updatedCache = {};
   let count = 0;
-  
+
   for (const [key, value] of entries) {
-    if ((now - value.timestamp) < MAX_CACHE_AGE && count < MAX_CACHE_SIZE) {
+    if (now - value.timestamp < MAX_CACHE_AGE && count < MAX_CACHE_SIZE) {
       updatedCache[key] = value;
       count++;
     }
   }
-  
+
   // If still too large, remove least recently used
   if (count >= MAX_CACHE_SIZE) {
     const sortedEntries = Object.entries(updatedCache)
@@ -58,10 +58,10 @@ async function evictOldEntries(cache) {
         return (aIndex === -1 ? Infinity : aIndex) - (bIndex === -1 ? Infinity : bIndex);
       })
       .slice(0, MAX_CACHE_SIZE - 1);
-    
+
     updatedCache = Object.fromEntries(sortedEntries);
   }
-  
+
   return updatedCache;
 }
 
@@ -70,18 +70,18 @@ async function getCachedWeather(location, units) {
   const cache = await loadCache();
   const key = `${location}-${units}`;
   const cached = cache[key];
-  
-  if (cached && (Date.now() - cached.timestamp) < CACHE_EXPIRY) {
+
+  if (cached && Date.now() - cached.timestamp < CACHE_EXPIRY) {
     // Update access order for LRU
     const index = accessOrder.indexOf(key);
     if (index > -1) {
       accessOrder.splice(index, 1);
     }
     accessOrder.push(key);
-    
+
     return cached.data;
   }
-  
+
   return null;
 }
 
@@ -93,14 +93,14 @@ async function setCachedWeather(location, units, data) {
     data,
     timestamp: Date.now()
   };
-  
+
   // Update access order
   const index = accessOrder.indexOf(key);
   if (index > -1) {
     accessOrder.splice(index, 1);
   }
   accessOrder.push(key);
-  
+
   // Evict old entries if needed
   const updatedCache = await evictOldEntries(cache);
   await saveCache(updatedCache);
@@ -111,19 +111,19 @@ async function cleanExpiredCache() {
   const cache = await loadCache();
   const now = Date.now();
   let cleaned = 0;
-  
+
   for (const [key, value] of Object.entries(cache)) {
-    if ((now - value.timestamp) >= CACHE_EXPIRY) {
+    if (now - value.timestamp >= CACHE_EXPIRY) {
       delete cache[key];
       cleaned++;
     }
   }
-  
+
   if (cleaned > 0) {
     await saveCache(cache);
     console.log(`🧹 Cleaned ${cleaned} expired cache entries`);
   }
-  
+
   return cleaned;
 }
 
@@ -134,16 +134,16 @@ async function getCacheStats() {
   let total = 0;
   let expired = 0;
   let valid = 0;
-  
+
   for (const [key, value] of Object.entries(cache)) {
     total++;
-    if ((now - value.timestamp) >= CACHE_EXPIRY) {
+    if (now - value.timestamp >= CACHE_EXPIRY) {
       expired++;
     } else {
       valid++;
     }
   }
-  
+
   return { total, expired, valid };
 }
 

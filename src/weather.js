@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import ora from 'ora';
 import httpClient from './api/http.js';
 import { getApiKey } from './api/auth.js';
@@ -9,16 +8,21 @@ const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
 // Regional temperature units mapping
 const FAHRENHEIT_COUNTRIES = new Set([
-  'US', 'USA', 'BS', 'BZ', 'KY', 'PW'  // US, Bahamas, Belize, Cayman Islands, Palau
+  'US',
+  'USA',
+  'BS',
+  'BZ',
+  'KY',
+  'PW' // US, Bahamas, Belize, Cayman Islands, Palau
 ]);
 
 // Temperature conversion utilities
 function celsiusToFahrenheit(celsius) {
-  return (celsius * 9/5) + 32;
+  return (celsius * 9) / 5 + 32;
 }
 
 function fahrenheitToCelsius(fahrenheit) {
-  return (fahrenheit - 32) * 5/9;
+  return ((fahrenheit - 32) * 5) / 9;
 }
 
 // Detect regional temperature unit preference
@@ -29,13 +33,13 @@ function getRegionalTempUnit(countryCode) {
 // Convert temperature between units
 function convertTemperature(temp, fromUnit, toUnit) {
   if (fromUnit === toUnit) return temp;
-  
+
   if (fromUnit === 'celsius' && toUnit === 'fahrenheit') {
     return celsiusToFahrenheit(temp);
   } else if (fromUnit === 'fahrenheit' && toUnit === 'celsius') {
     return fahrenheitToCelsius(temp);
   }
-  
+
   return temp;
 }
 
@@ -48,7 +52,7 @@ function determineDisplayUnits(countryCode, userPreference = null) {
   if (userPreference === 'celsius' || userPreference === 'metric') {
     return { api: 'metric', display: 'celsius' };
   }
-  
+
   // Auto-detect based on country
   const regionalUnit = getRegionalTempUnit(countryCode);
   return {
@@ -57,19 +61,16 @@ function determineDisplayUnits(countryCode, userPreference = null) {
   };
 }
 
-// Get weather by coordinates
-async function getWeatherByCoords(lat, lon, userUnits = null) {
-  const { latitude, longitude } = validateCoordinates(lat, lon);
+// Shared weather data fetching logic
+async function _fetchWeatherData(locationParams, userUnits, locationLabel) {
   const apiKey = await getApiKey();
-
   const spinner = ora('Fetching weather data...').start();
-  
+
   try {
-    // Get current weather (metric first to determine country)
+    // Get current weather in metric first to determine country
     const weatherResponse = await httpClient.get(`${BASE_URL}/weather`, {
       params: {
-        lat: latitude,
-        lon: longitude,
+        ...locationParams,
         appid: apiKey,
         units: 'metric'
       }
@@ -77,14 +78,13 @@ async function getWeatherByCoords(lat, lon, userUnits = null) {
 
     const countryCode = weatherResponse.data.sys.country;
     const unitSystem = determineDisplayUnits(countryCode, userUnits);
-    
-    // Get final weather data in correct units
+
+    // If we need different units than metric, fetch again
     let finalWeatherData = weatherResponse.data;
     if (unitSystem.api !== 'metric') {
       const weatherResponseFinal = await httpClient.get(`${BASE_URL}/weather`, {
         params: {
-          lat: latitude,
-          lon: longitude,
+          ...locationParams,
           appid: apiKey,
           units: unitSystem.api
         }
@@ -95,23 +95,25 @@ async function getWeatherByCoords(lat, lon, userUnits = null) {
     // Get 5-day forecast
     const forecastResponse = await httpClient.get(`${BASE_URL}/forecast`, {
       params: {
-        lat: latitude,
-        lon: longitude,
+        ...locationParams,
         appid: apiKey,
         units: unitSystem.api
       }
     });
 
-    // Get air pollution data for alerts
+    // Get air pollution data for alerts (always uses coords)
     const pollutionResponse = await httpClient.get(`${BASE_URL}/air_pollution`, {
       params: {
-        lat: latitude,
-        lon: longitude,
+        lat: finalWeatherData.coord.lat,
+        lon: finalWeatherData.coord.lon,
         appid: apiKey
       }
     });
 
-    spinner.succeed(`Weather data fetched! Using ${unitSystem.display === 'fahrenheit' ? 'Fahrenheit' : 'Celsius'} for ${countryCode}`);
+    spinner.succeed(
+      `Weather data fetched! Using ${unitSystem.display === 'fahrenheit' ? 'Fahrenheit' : 'Celsius'} for ${countryCode}`
+    );
+
     return {
       current: finalWeatherData,
       forecast: forecastResponse.data,
@@ -121,94 +123,14 @@ async function getWeatherByCoords(lat, lon, userUnits = null) {
     };
   } catch (error) {
     spinner.fail('Failed to fetch weather data');
-    
-    if (error.response?.status === 404) {
-      throw new WeatherError('Location not found', ERROR_CODES.LOCATION_NOT_FOUND, 404);
-    } else if (error.response?.status === 401) {
-      throw new WeatherError('Invalid API key', ERROR_CODES.API_KEY_INVALID, 401);
-    } else if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
-      throw new WeatherError('Request timed out. Please try again.', ERROR_CODES.NETWORK_ERROR);
-    } else if (error.response?.status === 429) {
-      throw new WeatherError(error.message, ERROR_CODES.RATE_LIMIT, 429);
-    }
-    
-    throw new WeatherError(
-      `Network error: ${error.message}`,
-      ERROR_CODES.NETWORK_ERROR
-    );
-  }
-}
 
-// Fetch weather data by location
-async function getWeather(location, userUnits = null) {
-  const validatedLocation = validateLocation(location);
-  const apiKey = await getApiKey();
-
-  const spinner = ora('Fetching weather data...').start();
-  
-  try {
-    // First, get location info to determine regional preferences
-    const weatherResponse = await httpClient.get(`${BASE_URL}/weather`, {
-      params: {
-        q: validatedLocation,
-        appid: apiKey,
-        units: 'metric' // Always fetch in metric first to get country code
-      }
-    });
-
-    const countryCode = weatherResponse.data.sys.country;
-    const unitSystem = determineDisplayUnits(countryCode, userUnits);
-    
-    // If we need different units than metric, fetch again
-    let finalWeatherData = weatherResponse.data;
-    let forecastData, pollutionData;
-    
-    if (unitSystem.api !== 'metric') {
-      const weatherResponseFinal = await httpClient.get(`${BASE_URL}/weather`, {
-        params: {
-          q: validatedLocation,
-          appid: apiKey,
-          units: unitSystem.api
-        }
-      });
-      finalWeatherData = weatherResponseFinal.data;
+    if (error instanceof WeatherError) {
+      throw error;
     }
 
-    // Get 5-day forecast
-    const forecastResponse = await httpClient.get(`${BASE_URL}/forecast`, {
-      params: {
-        q: validatedLocation,
-        appid: apiKey,
-        units: unitSystem.api
-      }
-    });
-
-    // Get air pollution data for alerts
-    const pollutionResponse = await httpClient.get(`${BASE_URL}/air_pollution`, {
-      params: {
-        lat: finalWeatherData.coord.lat,
-        lon: finalWeatherData.coord.lon,
-        appid: apiKey
-      }
-    });
-
-    spinner.succeed(`Weather data fetched! Using ${unitSystem.display === 'fahrenheit' ? 'Fahrenheit' : 'Celsius'} for ${countryCode}`);
-    
-    const data = {
-      current: finalWeatherData,
-      forecast: forecastResponse.data,
-      pollution: pollutionResponse.data,
-      displayUnit: unitSystem.display,
-      countryCode: countryCode
-    };
-    
-    return data;
-  } catch (error) {
-    spinner.fail('Failed to fetch weather data');
-    
     if (error.response?.status === 404) {
       throw new WeatherError(
-        `Location "${location}" not found. Please check the spelling.`,
+        `Location "${locationLabel}" not found. Please check the spelling or try: "City, Country Code" (e.g., "San Ramon, US")`,
         ERROR_CODES.LOCATION_NOT_FOUND,
         404
       );
@@ -219,9 +141,21 @@ async function getWeather(location, userUnits = null) {
     } else if (error.response?.status === 429) {
       throw new WeatherError(error.message, ERROR_CODES.RATE_LIMIT, 429);
     }
-    
-    throw error;
+
+    throw new WeatherError(`Network error: ${error.message}`, ERROR_CODES.NETWORK_ERROR);
   }
+}
+
+// Fetch weather data by location
+async function getWeather(location, userUnits = null) {
+  const validatedLocation = validateLocation(location);
+  return _fetchWeatherData({ q: validatedLocation }, userUnits, location);
+}
+
+// Get weather by coordinates
+async function getWeatherByCoords(lat, lon, userUnits = null) {
+  const { latitude, longitude } = validateCoordinates(lat, lon);
+  return _fetchWeatherData({ lat: latitude, lon: longitude }, userUnits, `${lat},${lon}`);
 }
 
 export {
