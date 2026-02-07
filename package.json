@@ -80,7 +80,7 @@
     "ora": "^8.2.0"
   },
   "devDependencies": {
-    "@playwright/mcp": "^0.0.35",
+    "@playwright/mcp": "^0.0.40",
     "@modelcontextprotocol/server-filesystem": "^2025.8.21",
     "@playwright/test": "^1.55.0",
     "eslint": "^9.0.0",
