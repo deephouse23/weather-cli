@@ -1,5 +1,7 @@
 import chalk from 'chalk';
 import boxen from 'boxen';
+import { getScene, isDaytime } from './ascii/index.js';
+import { AsciiRenderer } from './ascii/renderer.js';
 
 // Weather emoji mapping
 const weatherEmojis = {
@@ -85,7 +87,7 @@ function getTerminalWidth() {
 }
 
 // Display current weather in compact horizontal layout
-function displayCurrentWeather(data, displayUnit) {
+function displayCurrentWeather(data, displayUnit, options = {}) {
   // Check if data has current property or is the weather data directly
   const weather = data.current || data;
 
@@ -93,6 +95,25 @@ function displayCurrentWeather(data, displayUnit) {
   if (!weather || !weather.weather || !weather.weather[0]) {
     console.error(chalk.red('❌ Invalid weather data structure'));
     return;
+  }
+
+  // ASCII art rendering (opt-in via --art flag)
+  if (options.art && process.stdout.isTTY) {
+    const conditionCode = weather.weather[0].id;
+    const isDay = isDaytime(weather);
+    const scene = getScene(conditionCode, weather);
+    const paletteName = options.artStyle === 'retro' ? 'retro' : isDay ? 'day' : 'night';
+    const renderer = new AsciiRenderer({
+      termWidth: getTerminalWidth(),
+      paletteName
+    });
+
+    renderer.render(scene, { isDay });
+
+    if (options.artOnly) {
+      return;
+    }
+    console.log();
   }
 
   const emoji = weatherEmojis[weather.weather[0].main] || '🌤️';

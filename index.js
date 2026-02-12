@@ -28,7 +28,8 @@ import {
   getDefaultLocation,
   getDefaultUnits,
   setDefaultLocation,
-  setDefaultUnits
+  setDefaultUnits,
+  getAsciiConfig
 } from './src/config.js';
 import { WeatherError, mapErrorToExitCode } from './src/utils/errors.js';
 import { setApiKey, testApiKey } from './src/api/auth.js';
@@ -60,6 +61,17 @@ function showBetaBanner() {
 ╚══════════════════════════════════════╝
 `)
   );
+}
+
+// Build art display options from CLI flags and config
+async function buildArtOptions(options) {
+  const config = await getAsciiConfig();
+  const artEnabled = options.art !== undefined ? options.art : config.enabled;
+  return {
+    art: artEnabled,
+    artOnly: options.artOnly || false,
+    artStyle: options.artStyle || config.style || 'default'
+  };
 }
 
 // Compare weather between two cities
@@ -196,6 +208,10 @@ program
   .option('-u, --units <type>', 'Temperature units (metric/imperial/celsius/fahrenheit)', 'auto')
   .option('--celsius', 'Force Celsius temperature display')
   .option('--fahrenheit', 'Force Fahrenheit temperature display')
+  .option('--art', 'Display ASCII art weather scene')
+  .option('--no-art', 'Disable ASCII art')
+  .option('--art-only', 'Display only the ASCII art scene')
+  .option('--art-style <style>', 'Art color style: default, retro')
   .action(async (location, options) => {
     if (!location) {
       const defaultLocation = await getDefaultLocation();
@@ -209,19 +225,20 @@ program
     }
 
     const userUnits = processTemperatureOptions(options);
+    const artOpts = await buildArtOptions(options);
 
     // Check cache first
     const cacheKey = userUnits || 'auto';
     const cached = await getCachedWeather(location, cacheKey);
     if (cached) {
       console.log(chalk.gray('📦 Using cached data...'));
-      displayCurrentWeather(cached, cached.displayUnit);
+      displayCurrentWeather(cached, cached.displayUnit, artOpts);
       return;
     }
 
     const data = await getWeather(location, userUnits);
     await setCachedWeather(location, cacheKey, data);
-    displayCurrentWeather(data, data.displayUnit);
+    displayCurrentWeather(data, data.displayUnit, artOpts);
   });
 
 program
@@ -230,6 +247,9 @@ program
   .option('-u, --units <type>', 'Temperature units (metric/imperial/celsius/fahrenheit)', 'auto')
   .option('--celsius', 'Force Celsius temperature display')
   .option('--fahrenheit', 'Force Fahrenheit temperature display')
+  .option('--art', 'Display ASCII art weather scene')
+  .option('--no-art', 'Disable ASCII art')
+  .option('--art-style <style>', 'Art color style: default, retro')
   .action(async (location, options) => {
     if (!location) {
       const defaultLocation = await getDefaultLocation();
@@ -241,8 +261,9 @@ program
     }
 
     const userUnits = processTemperatureOptions(options);
+    const artOpts = await buildArtOptions(options);
     const data = await getWeather(location, userUnits);
-    displayCurrentWeather(data, data.displayUnit);
+    displayCurrentWeather(data, data.displayUnit, artOpts);
     display24HourForecast(data, data.displayUnit);
   });
 
@@ -252,6 +273,9 @@ program
   .option('-u, --units <type>', 'Temperature units (metric/imperial/celsius/fahrenheit)', 'auto')
   .option('--celsius', 'Force Celsius temperature display')
   .option('--fahrenheit', 'Force Fahrenheit temperature display')
+  .option('--art', 'Display ASCII art weather scene')
+  .option('--no-art', 'Disable ASCII art')
+  .option('--art-style <style>', 'Art color style: default, retro')
   .action(async (location, options) => {
     if (!location) {
       const defaultLocation = await getDefaultLocation();
@@ -263,8 +287,9 @@ program
     }
 
     const userUnits = processTemperatureOptions(options);
+    const artOpts = await buildArtOptions(options);
     const data = await getWeather(location, userUnits);
-    displayCurrentWeather(data, data.displayUnit);
+    displayCurrentWeather(data, data.displayUnit, artOpts);
     display5DayForecast(data, data.displayUnit);
   });
 
@@ -285,11 +310,15 @@ program
   .option('-u, --units <type>', 'Temperature units (metric/imperial/celsius/fahrenheit)', 'auto')
   .option('--celsius', 'Force Celsius temperature display')
   .option('--fahrenheit', 'Force Fahrenheit temperature display')
+  .option('--art', 'Display ASCII art weather scene')
+  .option('--no-art', 'Disable ASCII art')
+  .option('--art-style <style>', 'Art color style: default, retro')
   .action(async (coordinates, options) => {
     const [lat, lon] = coordinates.split(',').map((coord) => coord.trim());
     const userUnits = processTemperatureOptions(options);
+    const artOpts = await buildArtOptions(options);
     const data = await getWeatherByCoords(lat, lon, userUnits);
-    displayCurrentWeather(data, data.displayUnit);
+    displayCurrentWeather(data, data.displayUnit, artOpts);
   });
 
 program
@@ -424,8 +453,14 @@ async function main() {
       // First argument is not a known command, treat as location for current weather
       showBetaBanner();
 
+      // Filter out art-style value so it's not treated as a location word
+      const locationArgs = args.filter((arg, i) => {
+        if (args[i - 1] === '--art-style') return false;
+        return true;
+      });
+
       // Use parseLocation to intelligently parse the location
-      const location = parseLocation(args);
+      const location = parseLocation(locationArgs);
 
       if (!location) {
         console.error(chalk.red('❌ Please specify a location'));
@@ -444,6 +479,16 @@ async function main() {
       };
       const userUnits = processTemperatureOptions(options);
 
+      // Process art options
+      const artFlagOptions = {
+        art: args.includes('--art') ? true : args.includes('--no-art') ? false : undefined,
+        artOnly: args.includes('--art-only'),
+        artStyle: args.includes('--art-style')
+          ? args[args.indexOf('--art-style') + 1] || 'default'
+          : undefined
+      };
+      const artOpts = await buildArtOptions(artFlagOptions);
+
       const showForecast = args.includes('-f') || args.includes('--forecast');
 
       // Check cache first
@@ -457,7 +502,7 @@ async function main() {
         data = await getWeather(location, userUnits);
         await setCachedWeather(location, cacheKey, data);
       }
-      displayCurrentWeather(data, data.displayUnit);
+      displayCurrentWeather(data, data.displayUnit, artOpts);
 
       if (showForecast) {
         display24HourForecast(data, data.displayUnit);
