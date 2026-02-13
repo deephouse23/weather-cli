@@ -66,10 +66,11 @@ function showBetaBanner() {
 // Build art display options from CLI flags and config
 async function buildArtOptions(options) {
   const config = await getAsciiConfig();
-  const artEnabled = options.art !== undefined ? options.art : config.enabled;
+  const artOnly = options.artOnly || false;
+  const artEnabled = artOnly ? true : options.art !== undefined ? options.art : config.enabled;
   return {
     art: artEnabled,
-    artOnly: options.artOnly || false,
+    artOnly,
     artStyle: options.artStyle || config.style || 'default'
   };
 }

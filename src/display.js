@@ -97,6 +97,11 @@ function displayCurrentWeather(data, displayUnit, options = {}) {
     return;
   }
 
+  // If artOnly is set, suppress the weather card even when not a TTY
+  if (options.artOnly && !process.stdout.isTTY) {
+    return;
+  }
+
   // ASCII art rendering (opt-in via --art flag)
   if (options.art && process.stdout.isTTY) {
     const conditionCode = weather.weather[0].id;
