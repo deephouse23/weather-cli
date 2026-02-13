@@ -58,6 +58,17 @@ function processTemperatureOptions(options) {
   return null; // Use auto-detection
 }
 
+async function getAsciiConfig() {
+  const config = await loadConfig();
+  return config.ascii || { enabled: false, style: 'default' };
+}
+
+async function setAsciiConfig(asciiConfig) {
+  const config = await loadConfig();
+  config.ascii = { ...(config.ascii || {}), ...asciiConfig };
+  await saveConfig(config);
+}
+
 export {
   loadConfig,
   saveConfig,
@@ -65,5 +76,7 @@ export {
   getDefaultUnits,
   setDefaultLocation,
   setDefaultUnits,
-  processTemperatureOptions
+  processTemperatureOptions,
+  getAsciiConfig,
+  setAsciiConfig
 };
