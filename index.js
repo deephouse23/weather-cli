@@ -67,7 +67,9 @@ function showBetaBanner() {
 async function buildArtOptions(options) {
   const config = await getAsciiConfig();
   const artOnly = options.artOnly || false;
-  const artEnabled = artOnly ? true : options.art !== undefined ? options.art : config.enabled;
+  // artOnly and --art-style both imply art: user explicitly requesting art/ style
+  const artEnabled =
+    artOnly || options.artStyle ? true : options.art !== undefined ? options.art : config.enabled;
   return {
     art: artEnabled,
     artOnly,
