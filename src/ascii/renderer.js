@@ -6,7 +6,8 @@ const MIN_TERM_WIDTH = 50;
 class AsciiRenderer {
   constructor(options = {}) {
     this.termWidth = options.termWidth || process.stdout.columns || 80;
-    this.useColor = options.useColor !== undefined ? options.useColor : !process.env.NO_COLOR;
+    this.useColor =
+      options.useColor !== undefined ? options.useColor : process.env.NO_COLOR === undefined;
     this.palette = getPalette(options.paletteName);
   }
 
