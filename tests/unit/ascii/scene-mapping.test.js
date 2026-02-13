@@ -25,7 +25,7 @@ const noSunData = {
 
 describe('SCENE_MAP', () => {
   it('maps thunderstorm codes (200-232) to thunder', () => {
-    const codes = [200, 201, 202, 210, 211, 212, 213, 221, 230, 231, 232];
+    const codes = [200, 201, 202, 210, 211, 212, 221, 230, 231, 232];
     for (const code of codes) {
       expect(SCENE_MAP[code], `code ${code}`).toBe(thunder);
     }

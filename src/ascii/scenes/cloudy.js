@@ -31,7 +31,8 @@ export default {
     ']': 'houseWindow',
     _: 'houseWall',
     '=': 'houseDoor',
-    '|': 'houseWall'
+    '|': 'houseWall',
+    "'": 'houseWall'
   },
   getArt() {
     return art;

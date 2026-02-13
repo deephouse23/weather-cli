@@ -14,7 +14,6 @@ const SCENE_MAP = {
   210: thunder,
   211: thunder,
   212: thunder,
-  213: thunder,
   221: thunder,
   230: thunder,
   231: thunder,
