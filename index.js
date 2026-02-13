@@ -505,7 +505,7 @@ async function main() {
       }
       displayCurrentWeather(data, data.displayUnit, artOpts);
 
-      if (showForecast) {
+      if (showForecast && !artOpts.artOnly) {
         display24HourForecast(data, data.displayUnit);
       }
     } else {
