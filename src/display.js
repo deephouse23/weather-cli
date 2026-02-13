@@ -97,13 +97,10 @@ function displayCurrentWeather(data, displayUnit, options = {}) {
     return;
   }
 
-  // If artOnly is set, suppress the weather card even when not a TTY
-  if (options.artOnly && !process.stdout.isTTY) {
-    return;
-  }
-
   // ASCII art rendering (opt-in via --art flag)
-  if (options.art && process.stdout.isTTY) {
+  // When artOnly, render art even when not a TTY (e.g. piped) so output is not silent
+  const canShowArt = options.art && (process.stdout.isTTY || options.artOnly);
+  if (canShowArt) {
     const conditionCode = weather.weather[0].id;
     const isDay = isDaytime(weather);
     const scene = getScene(conditionCode, weather);
