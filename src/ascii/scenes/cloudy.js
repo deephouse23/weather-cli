@@ -1,4 +1,7 @@
-const art = [
+// Cloudy animation frames - drifting clouds
+// 4 frames with subtle cloud movement (all within width 55)
+
+const cloudyFrame0 = [
   '            .-~~~-.                                  ',
   '      .- ~ ~-(       )- ~                            ',
   '     /                     \\      .-~~~-.           ',
@@ -14,10 +17,60 @@ const art = [
   '   |_________|___|__________|=|=|=|=|=|              '
 ];
 
+const cloudyFrame1 = [
+  '          .-~~~-.                                    ',
+  '     .- ~ ~-(       )- ~                            ',
+  '    /                     \\   .-~~~-.              ',
+  '   |                       |.- ~-(       )- ~     ',
+  '    \\                     /                  \\   ',
+  '      ~- . _____ . -~       \\                /    ',
+  '                              ~- . ___ . -~         ',
+  '            ( _ _._                                 ',
+  "           |_|-'_~_`-._                            ",
+  "        .-'-_~_-~_-~-_`-._                         ",
+  '   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                     ',
+  '   | []  []   ___   []  [] |_._._._._.               ',
+  '   |_________|___|__________|=|=|=|=|=|              '
+];
+
+const cloudyFrame2 = [
+  '            .-~~~-.                                  ',
+  '      .- ~ ~-(       )- ~                            ',
+  '     /                     \\      .-~~~-.           ',
+  '    |                       |.- ~-(       )- ~       ',
+  '     \\                     /                  \\    ',
+  '       ~- . _____ . -~      \\                /     ',
+  '                               ~- . ___ . -~        ',
+  '           ( _ _._                                   ',
+  "          |_|-'_~_`-._                              ",
+  "       .-'-_~_-~_-~-_`-._                           ",
+  '   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                     ',
+  '   | []  []   ___   []  [] |_._._._._.               ',
+  '   |_________|___|__________|=|=|=|=|=|              '
+];
+
+const cloudyFrame3 = [
+  '          .-~~~-.                                    ',
+  '     .- ~ ~-(       )- ~                            ',
+  '    /                     \\   .-~~~-.              ',
+  '   |                       |.- ~-(       )- ~     ',
+  '    \\                     /                  \\   ',
+  '      ~- . _____ . -~       \\                /    ',
+  '                              ~- . ___ . -~         ',
+  '            ( _ _._                                 ',
+  "           |_|-'_~_`-._                            ",
+  "        .-'-_~_-~_-~-_`-._                         ",
+  '   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                     ',
+  '   | []  []   ___   []  [] |_._._._._.               ',
+  '   |_________|___|__________|=|=|=|=|=|              '
+];
+
+const frames = [cloudyFrame0, cloudyFrame1, cloudyFrame2, cloudyFrame3];
+
 export default {
   name: 'cloudy',
   width: 55,
-  height: art.length,
+  height: cloudyFrame0.length,
   defaultColor: 'cloudDark',
   charColors: {
     '-': 'cloud',
@@ -34,7 +87,15 @@ export default {
     '|': 'houseWall',
     "'": 'houseWall'
   },
-  getArt() {
-    return art;
-  }
+  // Return all frames for animation
+  getFrames() {
+    return frames;
+  },
+  // Return single frame for static display
+  // Accepts frameIndex (number) or options object for backwards compatibility
+  getArt(frameIndexOrOptions = 0) {
+    const frameIndex = typeof frameIndexOrOptions === 'number' ? frameIndexOrOptions : 0;
+    return frames[frameIndex % frames.length];
+  },
+  frameCount: frames.length
 };
