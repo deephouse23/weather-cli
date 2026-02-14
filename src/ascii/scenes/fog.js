@@ -1,11 +1,7 @@
-const art = [
-  '  = = = = = = = = = = = = = = = = = = = = = =      ',
-  '    - - - - - - - - - - - - - - - - - - - -         ',
-  '  = = = = = = = = = = = = = = = = = = = = = =      ',
-  '    - - - - - - - - - - - - - - - - - - - -         ',
-  '  = = = = = = = = = = = = = = = = = = = = = =      ',
-  '    - - - - - - - - - - - - - - - - - - - -         ',
-  '  = = = = = = = = = = = = = = = = = = = = = =      ',
+// Fog animation frames - drifting effect
+// Frame 0: shift left, Frame 1: center, Frame 2: shift right, Frame 3: center
+
+const houseLines = [
   '           ( _ _._                                   ',
   "          |_|-'_~_`-._                              ",
   "       .-'-_~_-~_-~-_`-._                           ",
@@ -14,10 +10,56 @@ const art = [
   '   |_________|___|__________|=|=|=|=|=|              '
 ];
 
+// Frame variations for drifting effect
+const frame0 = [
+  ' = = = = = = = = = = = = = = = = = = = = = =       ',
+  '   - - - - - - - - - - - - - - - - - - - -         ',
+  ' = = = = = = = = = = = = = = = = = = = = = =       ',
+  '   - - - - - - - - - - - - - = = = = = = = =       ',
+  ' = = = = = = = = = = = = = = = = = = = = = =       ',
+  '   - - - - - - - - - - - - - - - - - - - -         ',
+  ' = = = = = = = = = = = = = = = = = = = = = =       '
+];
+
+const frame1 = [
+  '  = = = = = = = = = = = = = = = = = = = = = =      ',
+  '    - - - - - - - - - - - - - - - - - - - -         ',
+  '  = = = = = = = = = = = = = = = = = = = = = =      ',
+  '    - - - - - - - - - - - - - - - - - - - -         ',
+  '  = = = = = = = = = = = = = = = = = = = = = =      ',
+  '    - - - - - - - - - - - - - - - - - - - -         ',
+  '  = = = = = = = = = = = = = = = = = = = = = =      '
+];
+
+const frame2 = [
+  '   = = = = = = = = = = = = = = = = = = = = = =     ',
+  '     - - - - - - - - - - - - - - - - - - - -       ',
+  '   = = = = = = = = = = = = = = = = = = = = = =     ',
+  '     - - - - - - - - - - - - - - = = = = = = =     ',
+  '   = = = = = = = = = = = = = = = = = = = = = =     ',
+  '     - - - - - - - - - - - - - - - - - - - -       ',
+  '   = = = = = = = = = = = = = = = = = = = = = =     '
+];
+
+const frame3 = [
+  '  = = = = = = = = = = = = = = = = = = = = = =      ',
+  '    - - - - - - - - - - - - - - - - - - - -         ',
+  '  = = = = = = = = = = = = = = = = = = = = = =      ',
+  '    - - - - - - - - - - - - - - - - - - - -         ',
+  '  = = = = = = = = = = = = = = = = = = = = = =      ',
+  '    - - - - - - - - - - - - - - - - - - - -         ',
+  '  = = = = = = = = = = = = = = = = = = = = = =      '
+];
+
+const frames = [frame0, frame1, frame2, frame3];
+
+// Build each frame by combining fog + house
+const frameArt = frames.map((fogFrame) => [...fogFrame, ...houseLines]);
+
 export default {
   name: 'fog',
   width: 55,
-  height: art.length,
+  height: frameArt[0].length,
   defaultColor: 'fog',
   charColors: {
     '=': 'fog',
@@ -32,7 +74,16 @@ export default {
     '.': 'houseWall',
     "'": 'houseWall'
   },
-  getArt() {
-    return art;
-  }
+  // Return all frames for animation
+  getFrames() {
+    return frameArt;
+  },
+  // Return single frame for static display
+  // Accepts frameIndex (number) or options object for backwards compatibility
+  getArt(frameIndexOrOptions = 0) {
+    // Handle both: getArt(0) and getArt({ isDay: true })
+    const frameIndex = typeof frameIndexOrOptions === 'number' ? frameIndexOrOptions : 0;
+    return frameArt[frameIndex % frameArt.length];
+  },
+  frameCount: frameArt.length
 };
