@@ -73,7 +73,8 @@ async function buildArtOptions(options) {
   return {
     art: artEnabled,
     artOnly,
-    artStyle: options.artStyle || config.style || 'default'
+    artStyle: options.artStyle || config.style || 'default',
+    animate: options.animate || false
   };
 }
 
@@ -215,6 +216,7 @@ program
   .option('--no-art', 'Disable ASCII art')
   .option('--art-only', 'Display only the ASCII art scene')
   .option('--art-style <style>', 'Art color style: default, retro')
+  .option('--animate', 'Animate the ASCII art scene')
   .action(async (location, options) => {
     if (!location) {
       const defaultLocation = await getDefaultLocation();
@@ -253,6 +255,7 @@ program
   .option('--art', 'Display ASCII art weather scene')
   .option('--no-art', 'Disable ASCII art')
   .option('--art-style <style>', 'Art color style: default, retro')
+  .option('--animate', 'Animate the ASCII art scene')
   .action(async (location, options) => {
     if (!location) {
       const defaultLocation = await getDefaultLocation();
@@ -279,6 +282,7 @@ program
   .option('--art', 'Display ASCII art weather scene')
   .option('--no-art', 'Disable ASCII art')
   .option('--art-style <style>', 'Art color style: default, retro')
+  .option('--animate', 'Animate the ASCII art scene')
   .action(async (location, options) => {
     if (!location) {
       const defaultLocation = await getDefaultLocation();
@@ -488,7 +492,8 @@ async function main() {
         artOnly: args.includes('--art-only'),
         artStyle: args.includes('--art-style')
           ? args[args.indexOf('--art-style') + 1] || 'default'
-          : undefined
+          : undefined,
+        animate: args.includes('--animate')
       };
       const artOpts = await buildArtOptions(artFlagOptions);
 

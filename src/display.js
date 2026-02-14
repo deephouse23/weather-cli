@@ -110,7 +110,20 @@ function displayCurrentWeather(data, displayUnit, options = {}) {
       paletteName
     });
 
-    renderer.render(scene, { isDay });
+    // Handle animation vs static render
+    if (options.animate && process.stdout.isTTY) {
+      // Start animation loop
+      const stopAnimation = renderer.animate(scene, { isDay });
+
+      // Keep animation running until user interrupts (Ctrl+C)
+      // The animation will stop naturally on process exit
+      process.on('SIGINT', () => {
+        stopAnimation();
+        process.exit(0);
+      });
+    } else {
+      renderer.render(scene, { isDay });
+    }
 
     if (options.artOnly) {
       return;
