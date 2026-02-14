@@ -89,7 +89,10 @@ export default {
     return frameArt;
   },
   // Return single frame for static display
-  getArt(frameIndex = 0) {
+  // Accepts frameIndex (number) or options object for backwards compatibility
+  getArt(frameIndexOrOptions = 0) {
+    // Handle both: getArt(0) and getArt({ isDay: true })
+    const frameIndex = typeof frameIndexOrOptions === 'number' ? frameIndexOrOptions : 0;
     return frameArt[frameIndex % frameArt.length];
   },
   frameCount: frameArt.length
