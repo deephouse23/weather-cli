@@ -38,7 +38,7 @@ class AsciiRenderer {
     let animationId;
     let isRunning = true;
 
-    // Clear previous line and render first frame
+    // Use renderToString to avoid duplicating centering/coloring logic
     const renderFrame = () => {
       if (!isRunning) return;
 
@@ -51,18 +51,11 @@ class AsciiRenderer {
       );
       readline.clearScreenDown(process.stdout);
 
-      const lines = scene.getArt(frameIndex);
-      const pad = Math.max(0, Math.floor((this.termWidth - scene.width) / 2));
-      const padding = ' '.repeat(pad);
-
-      const rendered = lines.map((line) => {
-        const colored = this.useColor
-          ? this.colorLine(line, scene.charColors, this.palette, scene.defaultColor)
-          : line;
-        return padding + colored;
-      });
-
-      console.log(rendered.join('\n'));
+      // Use renderToString for consistent rendering with width check
+      const output = this.renderToString(scene, { frameIndex });
+      if (output) {
+        console.log(output);
+      }
 
       frameIndex = (frameIndex + 1) % scene.frameCount;
 

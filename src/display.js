@@ -111,8 +111,8 @@ function displayCurrentWeather(data, displayUnit, options = {}) {
     });
 
     // Handle animation vs static render
-    if (options.animate && process.stdout.isTTY) {
-      // Start animation loop
+    if (options.animate && process.stdout.isTTY && scene.getFrames) {
+      // Start animation loop only if scene supports frames
       const stopAnimation = renderer.animate(scene, { isDay });
 
       // Keep animation running until user interrupts (Ctrl+C)

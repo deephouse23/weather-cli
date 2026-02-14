@@ -255,7 +255,6 @@ program
   .option('--art', 'Display ASCII art weather scene')
   .option('--no-art', 'Disable ASCII art')
   .option('--art-style <style>', 'Art color style: default, retro')
-  .option('--animate', 'Animate the ASCII art scene')
   .action(async (location, options) => {
     if (!location) {
       const defaultLocation = await getDefaultLocation();
@@ -282,7 +281,6 @@ program
   .option('--art', 'Display ASCII art weather scene')
   .option('--no-art', 'Disable ASCII art')
   .option('--art-style <style>', 'Art color style: default, retro')
-  .option('--animate', 'Animate the ASCII art scene')
   .action(async (location, options) => {
     if (!location) {
       const defaultLocation = await getDefaultLocation();
