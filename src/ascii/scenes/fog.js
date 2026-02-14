@@ -1,16 +1,6 @@
 // Fog animation frames - drifting effect
 // Frame 0: shift left, Frame 1: center, Frame 2: shift right, Frame 3: center
 
-const fogLines = [
-  '  = = = = = = = = = = = = = = = = = = = = = =      ',
-  '    - - - - - - - - - - - - - - - - - - - -         ',
-  '  = = = = = = = = = = = = = = = = = = = = = =      ',
-  '    - - - - - - - - - - - - - - - - - - - -         ',
-  '  = = = = = = = = = = = = = = = = = = = = = =      ',
-  '    - - - - - - - - - - - - - - - - - - - -         ',
-  '  = = = = = = = = = = = = = = = = = = = = = =      '
-];
-
 const houseLines = [
   '           ( _ _._                                   ',
   "          |_|-'_~_`-._                              ",
