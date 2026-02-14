@@ -1,4 +1,4 @@
-# weather-cli-16bit v0.3.24
+# weather-cli-16bit v0.3.59
 
 [![npm version](https://badge.fury.io/js/weather-cli-16bit.svg)](https://www.npmjs.com/package/weather-cli-16bit)
 [![CI](https://github.com/deephouse23/weather-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/deephouse23/weather-cli/actions/workflows/ci.yml)
@@ -85,6 +85,9 @@ weather 5day Tokyo            # 5-day forecast
 weather compare "New York" London
 weather coords 37.7749,-122.4194
 
+# ASCII Art (animated)
+weather San Francisco --art --animate
+
 # Interactive mode
 weather                       # No arguments starts interactive mode
 
@@ -164,6 +167,7 @@ tests/unit/
 - **Responsive Display** — adapts to terminal width with color-coded output
 - **Forecasts** — 24-hour and 5-day, city comparison, GPS coordinates
 - **Retry Logic** — exponential backoff for network issues
+- **Animated ASCII Art** — animated weather scenes with `--art --animate`
 
 ## Development
 
@@ -226,6 +230,8 @@ npm run dev              # Dev mode with auto-restart
 | `--fahrenheit`       | Force Fahrenheit display                 |
 | `-f, --forecast`     | Include 24-hour forecast                 |
 | `-a, --alerts`       | Show weather alerts                      |
+| `--art`              | Display ASCII art weather scene         |
+| `--animate`          | Animate the ASCII art scene              |
 
 ## License
 
