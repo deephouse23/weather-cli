@@ -121,6 +121,10 @@ function displayCurrentWeather(data, displayUnit, options = {}) {
         stopAnimation();
         process.exit(0);
       });
+
+      // Return early - animation is running, don't print weather data below
+      // as it would get cleared by the animation loop
+      return;
     } else {
       renderer.render(scene, { isDay });
     }

@@ -87,7 +87,9 @@ class AsciiRenderer {
     }
 
     const frameIndex = options.frameIndex || 0;
-    const lines = scene.getArt ? scene.getArt(frameIndex) : scene.getArt();
+    // Only call getArt if it exists, otherwise use static art
+    const getArtFn = scene.getArt || (() => scene.art);
+    const lines = getArtFn(frameIndex);
     const pad = Math.max(0, Math.floor((this.termWidth - scene.width) / 2));
     const padding = ' '.repeat(pad);
 
