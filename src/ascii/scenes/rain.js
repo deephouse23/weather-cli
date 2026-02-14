@@ -1,5 +1,5 @@
 // Rain animation frames - falling rain drops
-// 4 frames with subtle rain position shifts (all within width 55)
+// 4 frames with subtle rain position shifts (all frames within width 55)
 
 const rainFrame0 = [
   '            .-~~~-.                                  ',
