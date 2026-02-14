@@ -1,5 +1,5 @@
 // Snow animation frames - falling snowflakes
-// 4 frames with subtle snow position shifts (all within width 55)
+// 4 frames with subtle snow position shifts (all within width 55, consistent across frames)
 
 const snowFrame0 = [
   '            .-~~~-.                                  ',
